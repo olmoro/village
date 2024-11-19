@@ -14,8 +14,8 @@
 // ------------------------------------------------------------------------
 //                              Версии 
 // ------------------------------------------------------------------------
-#define APP_VERSION "VILLAGE-20241117.002"
-// 20241117.002: Новая плата URC-2E.53
+#define APP_VERSION "VILLAGE-20241119.003"
+// 20241119.002: Новая плата URC-2E.54
 // 20241110.001: Общие параметры вынесены в common_config.h
 // 20241104.000: Заменены сенсоры на DS18B20
 
@@ -46,11 +46,11 @@
   #define CONFIG_GPIO_IR_2            CONFIG_GPIO_IR_X2     // Выход на ИК блока 2 (резерв)
 
 // Входы
-  #define CONFIG_GPIO_TSOP            CONFIG_GPIO_IR        // Вход ИК датчика
-  #define CONFIG_GPIO_FIRE            CONFIG_GPIO_X5        // Вход шлейфа охраны (резерв)
-  #define CONFIG_GPIO_TSTAT           CONFIG_GPIO_X4        // Вход термостата (резерв)
-  #define CONFIG_GPIO_LINE_1          CONFIG_GPIO_LINE_X6   // Вход контроля напряжения на реле бойлера
-  #define CONFIG_GPIO_LINE_2          CONFIG_GPIO_LINE_X7   // Вход контроля напряжения (резерв)
+  // #define CONFIG_GPIO_TSOP            CONFIG_GPIO_IR        // Вход ИК датчика
+  // #define CONFIG_GPIO_FIRE            CONFIG_GPIO_X5        // Вход шлейфа охраны (резерв)
+  // #define CONFIG_GPIO_TSTAT           CONFIG_GPIO_X4        // Вход термостата (резерв)
+  // #define CONFIG_GPIO_LINE_1          CONFIG_GPIO_LINE_X6   // Вход контроля напряжения на реле бойлера
+  // #define CONFIG_GPIO_LINE_2          CONFIG_GPIO_LINE_X7   // Вход контроля напряжения (резерв)
 
   // Датчики
   #define CONFIG_GPIO_TEMP_BOILER     CONFIG_GPIO_TEMP_X1    // Датчик температуры теплоносителя
@@ -62,6 +62,14 @@
   #define CONFIG_GPIO_RELAY_BOILER2    CONFIG_GPIO_RELAY_K2  // Выход на силовое реле (резерв)
   #define CONFIG_GPIO_RELAY_ALARM1     CONFIG_GPIO_RELAY_K4  // Выход на реле аварии бойлера
   #define CONFIG_GPIO_RELAY_ALARM2     CONFIG_GPIO_RELAY_K3  // Выход на реле аварии (резерв)
+
+  // Зоны сигнализации
+  #define CONFIG_GPIO_ALARM_ZONE_1    CONFIG_GPIO_X4        // Вход термостата (резерв)
+  #define CONFIG_GPIO_ALARM_ZONE_2    CONFIG_GPIO_X5        // Вход шлейфа охраны (резерв)
+  #define CONFIG_GPIO_ALARM_ZONE_3    CONFIG_GPIO_LINE_X6   // Вход контроля напряжения на реле бойлера
+  #define CONFIG_GPIO_ALARM_ZONE_4    CONFIG_GPIO_LINE_X7   // Вход контроля напряжения (резерв)
+  #define CONFIG_GPIO_ALARM_ZONE_5    CONFIG_GPIO_IR        // Вход ИК датчика (резерв)
+  #define CONFIG_GPIO_ALARM_LEVEL     0x01                  // уточнить
 
 #endif
 
