@@ -8,7 +8,7 @@
 
 // #include "reRx433.h"  /* !!! reAlarm.cpp:17:10  */
 // //#include "reBeep.h"   /* !!! reAlarm.cpp:20:10  */
-// #include "reAlarm.h"
+#include "reAlarm.h"
 
 #ifdef __cplusplus
   extern "C" {

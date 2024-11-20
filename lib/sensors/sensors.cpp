@@ -13,7 +13,9 @@
 #include "reEvents.h"
 #include "reMqtt.h"
 #include "reEsp32.h"
-//#include "reI2C.h"
+#if defined(CONFIG_GPIO_I2C) && (CONFIG_GPIO_I2C > -1)
+  #include "reI2C.h"
+#endif  // CONFIG_GPIO_I2C
 #include "reWiFi.h"
 #include "reRangeMonitor.h"
 #include "reLoadCtrl.h"

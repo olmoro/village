@@ -32,6 +32,9 @@
 
   #define CONFIG_GPIO_TEST_PAD      14    // Test 
 
+  #define CONFIG_GPIO_I2C           -1    // Не используются
+  #define CONFIG_GPIO_BUZZER        -1    // Не используются
+
 #else
   // Номер выводов периферии, версия платы 023 (с доработкой)
   // Светодиоды
@@ -110,6 +113,36 @@
 // Публиковать экстеремумы только при их изменении
 #define CONFIG_SENSOR_EXTREMUMS_OPTIMIZED 1
 
+// ------------------------------------------------------------------------
+//                           RU - Сигнализация 
+// ------------------------------------------------------------------------
+// EN: Use static memory allocation for the fire alarm task
+// RU: Использовать статическое выделение памяти для задачи охранно-пожарной сигнализации
+#define CONFIG_ALARM_STATIC_ALLOCATION 1
+// EN: Stack size for the fire alarm task
+// RU: Размер стека для задачи охранно-пожарной сигнализации
+#define CONFIG_ALARM_STACK_SIZE 4098
+// EN: Queue size for the fire alarm task
+// RU: Размер очереди для задачи охранно-пожарной сигнализации
+#define CONFIG_ALARM_QUEUE_SIZE 32
+// EN: Device topic for OPS
+// RU: Топик устройства для ОПС
+// #define CONFIG_ALARM_MQTT_DEVICE_TOPIC "home"
+// EN: Publish the status of OPS sensors in local topics for transmission to other devices
+// RU: Публиковать состояние сенсоров ОПС в локальных топиках для передачи на другие устройства
+#define CONFIG_ALARM_LOCAL_PUBLISH true
+// EN: Scheme of OPS topics: 0 - %location%/config/security/mode; 1 - %location%/%device%/config/security/mode
+// RU: Схема топиков ОПС: 0 - %location%/config/security/mode; 1 - %location%/%device%/config/security/mode
+#define CONFIG_ALARM_MQTT_DEVICE_MODE 0
+// EN: Scheme of OPS topics: 0 - %location%/security/events/%zone%; 1 - %location%/%device%/security/events/%zone%
+// RU: Схема топиков ОПС: 0 - %location%/security/events/%zone%; 1 - %location%/%device%/security/events/%zone%
+#define CONFIG_ALARM_MQTT_DEVICE_EVENTS 0
+// EN: Scheme of OPS topics: 0 - %location%/security/status/%device%; 1 - %location%/%device%/security/status
+// RU: Схема топиков ОПС: 0 - %location%/security/status/%device%; 1 - %location%/%device%/security/status
+#define CONFIG_ALARM_MQTT_DEVICE_STATUS 0
+// EN: When disabling the alarm from the remote control, immediately disarm; otherwise disable the alarm without disarming
+// RU: При отключении тревоги с пульта сразу же снять с охраны; иначе отключить тревогу без снятия с охраны
+#define CONFIG_ALARM_TOGETHER_DISABLE_SIREN_AND_ALARM 1
 
 // ------------------------------------------------------------------------
 //                               WiFi сети 
