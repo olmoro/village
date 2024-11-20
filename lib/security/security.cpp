@@ -21,9 +21,9 @@ static const char* logTAG = "ALARM";
 
 // Объекты reGPIO для обработки прерываний по проводным входым ОПС
 static reGPIO gpioAlarm1(CONFIG_GPIO_ALARM_ZONE_1, CONFIG_GPIO_ALARM_LEVEL, false, true, CONFIG_BUTTON_DEBOUNCE_TIME_US, nullptr);
-// static reGPIO gpioAlarm2(CONFIG_GPIO_ALARM_ZONE_2, CONFIG_GPIO_ALARM_LEVEL, false, true, CONFIG_BUTTON_DEBOUNCE_TIME_US, nullptr);
-// static reGPIO gpioAlarm3(CONFIG_GPIO_ALARM_ZONE_3, CONFIG_GPIO_ALARM_LEVEL, false, true, CONFIG_BUTTON_DEBOUNCE_TIME_US, nullptr);
-// static reGPIO gpioAlarm4(CONFIG_GPIO_ALARM_ZONE_4, CONFIG_GPIO_ALARM_LEVEL, false, true, CONFIG_BUTTON_DEBOUNCE_TIME_US, nullptr);
+static reGPIO gpioAlarm2(CONFIG_GPIO_ALARM_ZONE_2, CONFIG_GPIO_ALARM_LEVEL, false, true, CONFIG_BUTTON_DEBOUNCE_TIME_US, nullptr);
+static reGPIO gpioAlarm3(CONFIG_GPIO_ALARM_ZONE_3, CONFIG_GPIO_ALARM_LEVEL, false, true, CONFIG_BUTTON_DEBOUNCE_TIME_US, nullptr);
+static reGPIO gpioAlarm4(CONFIG_GPIO_ALARM_ZONE_4, CONFIG_GPIO_ALARM_LEVEL, false, true, CONFIG_BUTTON_DEBOUNCE_TIME_US, nullptr);
 // static reGPIO gpioAlarm5(CONFIG_GPIO_ALARM_ZONE_5, CONFIG_GPIO_ALARM_LEVEL, false, true, CONFIG_BUTTON_DEBOUNCE_TIME_US, nullptr);
 
 // ------------------------------------------------------------------------
@@ -219,8 +219,48 @@ void alarmInitSensors()
       false);                                       // Тревога без подтверждения с других датчиков
   };
 
+  // Проводная зона 2: PIR сенсор в прихожей
+  gpioAlarm2.initGPIO();
+  alarmSensorHandle_t asGasLeak = alarmSensorAdd(AST_WIRED, "Газ", "gas", CONFIG_ALARM_LOCAL_PUBLISH, CONFIG_GPIO_ALARM_ZONE_3);
+  if (asGasLeak) {
+    alarmEventSet(asGasLeak, azFire, 0, ASE_ALARM, 
+      1, CONFIG_ALARM_EVENT_MESSAGE_GAS,            // Сообщение при сигнале тревоги: "🚨 Обнаружена утечка газа"
+      0, CONFIG_ALARM_EVENT_MESSAGE_CLEAR,          // Сообщение при отмене тревоги: "🟢 Авария устранена"
+      1,                                            // Порог срабатывания (нужен только для беспроводных датчиков, для остальных = 1)
+      0,                                            // Время автосброса тревоги по таймеру, 0 = отключено
+      60,                                           // Период публикации на MQTT брокере
+      false);                                       // Тревога без подтверждения с других датчиков
+  };
 
+  // Проводная зона 3: контроль питания 220В на первом
+  #if defined(CONFIG_GPIO_ALARM_ZONE_3) && (CONFIG_GPIO_ALARM_ZONE_3 > -1)
+    gpioAlarm3.initGPIO();
+    alarmSensorHandle_t asPowerMain1 = alarmSensorAdd(AST_WIRED, "Питание 220В", "main_power", CONFIG_ALARM_LOCAL_PUBLISH, CONFIG_GPIO_ALARM_ZONE_3);
+    if (asPowerMain1) {
+      alarmEventSet(asPowerMain1, azPower1, 0, ASE_POWER, 
+        1, CONFIG_ALARM_EVENT_MESSAGE_POWER_MAIN_OFF, // Сообщение при сигнале тревоги: "🔴 Питание первого блока отключено"
+        0, CONFIG_ALARM_EVENT_MESSAGE_POWER_MAIN_ON,  // Сообщение при отмене тревоги: "💡 Питание первого блока восстановлено"
+        1,                                            // Порог срабатывания (нужен только для беспроводных датчиков, для остальных = 1)
+        0,                                            // Время автосброса тревоги по таймеру, 0 = отключено
+        0,                                            // Без повторной публикации состояния
+        false);                                       // Тревога без подтверждения с других датчиков
+    };
+  #endif // CONFIG_GPIO_ALARM_ZONE_3
 
+  // Проводная зона 4: контроль питания 220В на втором
+  #if defined(CONFIG_GPIO_ALARM_ZONE_4) && (CONFIG_GPIO_ALARM_ZONE_4 > -1)
+    gpioAlarm4.initGPIO();
+    alarmSensorHandle_t asPowerMain2 = alarmSensorAdd(AST_WIRED, "Питание 220В", "main_power", CONFIG_ALARM_LOCAL_PUBLISH, CONFIG_GPIO_ALARM_ZONE_4);
+    if (asPowerMain2) {
+      alarmEventSet(asPowerMain2, azPower2, 0, ASE_POWER, 
+        1, CONFIG_ALARM_EVENT_MESSAGE_POWER_MAIN_OFF, // Сообщение при сигнале тревоги: "🔴 Питание второго блока отключено"
+        0, CONFIG_ALARM_EVENT_MESSAGE_POWER_MAIN_ON,  // Сообщение при отмене тревоги: "💡 Питание второго блока восстановлено"
+        1,                                            // Порог срабатывания (нужен только для беспроводных датчиков, для остальных = 1)
+        0,                                            // Время автосброса тревоги по таймеру, 0 = отключено
+        0,                                            // Без повторной публикации состояния
+        false);                                       // Тревога без подтверждения с других датчиков
+    };
+  #endif // CONFIG_GPIO_ALARM_ZONE_4
 
 
 
