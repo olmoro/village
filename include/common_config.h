@@ -10,11 +10,11 @@
   #define CONFIG_GPIO_LED_BLUE      12    // Синий,   катод на GND (4mA)
 
   // Входы
+  #define CONFIG_GPIO_DOOR_X4       27    // Вход X4 Двери
+  #define CONFIG_GPIO_FIRE_X5       26    // Вход X5 Пожар
+  #define CONFIG_GPIO_POWER_X6      32    // Вход контроля напряжения на X6
+  #define CONFIG_GPIO_POWER_X7      33    // Вход контроля напряжения на X7
   #define CONFIG_GPIO_IR            35    // Вход ИК датчика
-  #define CONFIG_GPIO_X5            26    // Вход X5
-  #define CONFIG_GPIO_X4            27    // Вход X4
-  #define CONFIG_GPIO_LINE_X6       32    // Вход контроля напряжения на X6
-  #define CONFIG_GPIO_LINE_X7       33    // Вход контроля напряжения на X7
 
   // Датчики температуры, все DS18B20
   #define CONFIG_GPIO_TEMP_X1       25    // Датчик температуры, подключен к X1
@@ -32,8 +32,12 @@
 
   #define CONFIG_GPIO_TEST_PAD      14    // Test 
 
-  #define CONFIG_GPIO_I2C           -1    // Не используются
-  #define CONFIG_GPIO_BUZZER        -1    // Не используются
+  // Отсутствующие на плате ресурсы
+  #define CONFIG_GPIO_I2C           -1
+  #define CONFIG_GPIO_RX433         -1
+  #define CONFIG_GPIO_BUZZER        -1
+  #define CONFIG_GPIO_BUZZER_ACTIVE -1
+
 
 #else
   // Номер выводов периферии, версия платы 023 (с доработкой)
@@ -119,29 +123,36 @@
 // EN: Use static memory allocation for the fire alarm task
 // RU: Использовать статическое выделение памяти для задачи охранно-пожарной сигнализации
 #define CONFIG_ALARM_STATIC_ALLOCATION 1
+
 // EN: Stack size for the fire alarm task
 // RU: Размер стека для задачи охранно-пожарной сигнализации
 #define CONFIG_ALARM_STACK_SIZE 4098
+
 // EN: Queue size for the fire alarm task
 // RU: Размер очереди для задачи охранно-пожарной сигнализации
 #define CONFIG_ALARM_QUEUE_SIZE 32
-// EN: Device topic for OPS
+
 // RU: Топик устройства для ОПС
 // #define CONFIG_ALARM_MQTT_DEVICE_TOPIC "home"
-// EN: Publish the status of OPS sensors in local topics for transmission to other devices
-// RU: Публиковать состояние сенсоров ОПС в локальных топиках для передачи на другие устройства
+
+/* Публиковать состояние сенсоров ОПС в локальных топиках 
+   для передачи на другие устройства */
 #define CONFIG_ALARM_LOCAL_PUBLISH true
-// EN: Scheme of OPS topics: 0 - %location%/config/security/mode; 1 - %location%/%device%/config/security/mode
-// RU: Схема топиков ОПС: 0 - %location%/config/security/mode; 1 - %location%/%device%/config/security/mode
+
+/* Схема топиков ОПС: 0 - %location%/config/security/mode; 
+                      1 - %location%/%device%/config/security/mode */
 #define CONFIG_ALARM_MQTT_DEVICE_MODE 0
-// EN: Scheme of OPS topics: 0 - %location%/security/events/%zone%; 1 - %location%/%device%/security/events/%zone%
-// RU: Схема топиков ОПС: 0 - %location%/security/events/%zone%; 1 - %location%/%device%/security/events/%zone%
+
+/* Схема топиков ОПС: 0 - %location%/security/events/%zone%; 
+                      1 - %location%/%device%/security/events/%zone% */
 #define CONFIG_ALARM_MQTT_DEVICE_EVENTS 0
-// EN: Scheme of OPS topics: 0 - %location%/security/status/%device%; 1 - %location%/%device%/security/status
-// RU: Схема топиков ОПС: 0 - %location%/security/status/%device%; 1 - %location%/%device%/security/status
+
+/* Схема топиков ОПС: 0 - %location%/security/status/%device%; 
+                      1 - %location%/%device%/security/status */
 #define CONFIG_ALARM_MQTT_DEVICE_STATUS 0
-// EN: When disabling the alarm from the remote control, immediately disarm; otherwise disable the alarm without disarming
-// RU: При отключении тревоги с пульта сразу же снять с охраны; иначе отключить тревогу без снятия с охраны
+
+/* При отключении тревоги с пульта сразу же снять с охраны, 
+   иначе отключить тревогу без снятия с охраны */
 #define CONFIG_ALARM_TOGETHER_DISABLE_SIREN_AND_ALARM 1
 
 // ------------------------------------------------------------------------
