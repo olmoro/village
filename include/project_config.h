@@ -23,19 +23,80 @@
 //                             TARGET
 // ------------------------------------------------------------------------
 /* BOILER - прототип выбирается по умолчанию */
+//#define FREEZER   // Вариант автомата морозильника
 //#define PUMPER    // Вариант автомата подкачки
 //#define SOLAR     // Вариант солнечного бойлера
 //#define ROTATION  // Вариант устройства ротации кондиционеров
 
 
 #if PUMPER
+  // Светодиоды
+  #define CONFIG_GPIO_SYSTEM_LED      CONFIG_GPIO_LED_BLUE  // Системный Синий
+  #define CONFIG_GPIO_MODE_LED        CONFIG_GPIO_LED_GREEN // зел
+  #define CONFIG_GPIO_ALARM_FLASH     CONFIG_GPIO_LED_RED   // Красный мигающий сигнал аварии
+
+  // Датчики
   #define CONFIG_GPIO_TEMP_OUTDOOR    CONFIG_GPIO_TEMP_X3    // Датчик температуры внешний
+
+ // Выходы
+  #define CONFIG_GPIO_RELAY_BOILER    CONFIG_GPIO_RELAY_K2  // Выход на реле насоса
+  #define CONFIG_GPIO_RELAY_ALARM1    CONFIG_GPIO_RELAY_K4  // Выход на реле аварии (сирена)
+  #define CONFIG_GPIO_RELAY_ALARM2    CONFIG_GPIO_RELAY_K3  // Выход на реле аварии (маяк)
+
+  // Зоны сигнализации
+  #define CONFIG_GPIO_ALARM_ZONE_1    CONFIG_GPIO_X4        // Вход контроля уровня (резерв)
+  #define CONFIG_GPIO_ALARM_ZONE_2    CONFIG_GPIO_X5        // Вход шлейфа охраны (резерв)
+  //#define CONFIG_GPIO_ALARM_ZONE_3    CONFIG_GPIO_LINE_X6   // Вход контроля напряжения на реле 
+  #define CONFIG_GPIO_ALARM_ZONE_4    CONFIG_GPIO_LINE_X7   // Вход контроля напряжения насоса
+  #define CONFIG_GPIO_ALARM_ZONE_5    CONFIG_GPIO_IR        // Вход ИК датчика (резерв)
+  #define CONFIG_GPIO_ALARM_LEVEL     0x01                  // уточнить
 
 #elif SOLAR
-  #define CONFIG_GPIO_TEMP_OUTDOOR    CONFIG_GPIO_TEMP_X3    // Датчик температуры внешний
+  // Светодиоды
+  #define CONFIG_GPIO_SYSTEM_LED      CONFIG_GPIO_LED_BLUE  // Системный Синий
+  #define CONFIG_GPIO_MODE_LED        CONFIG_GPIO_LED_GREEN // зел
+  #define CONFIG_GPIO_ALARM_FLASH     CONFIG_GPIO_LED_RED   // Красный мигающий сигнал аварии
+ 
+   // Датчики
+  #define CONFIG_GPIO_TEMP_OUTDOOR    CONFIG_GPIO_TEMP_X3    // Датчик температуры в коллекторе
+  #define CONFIG_GPIO_TEMP_BOILER     CONFIG_GPIO_TEMP_X1    // Датчик температуры в накопителе
+
+  // Выходы
+  #define CONFIG_GPIO_RELAY_BOILER    CONFIG_GPIO_RELAY_K2  // Выход на реле насоса
+  #define CONFIG_GPIO_RELAY_ALARM1    CONFIG_GPIO_RELAY_K4  // Выход на реле аварии (сирена)
+  #define CONFIG_GPIO_RELAY_ALARM2    CONFIG_GPIO_RELAY_K3  // Выход на реле аварии (маяк)
+  
+  // Зоны сигнализации
+  #define CONFIG_GPIO_ALARM_ZONE_1    CONFIG_GPIO_X4        // Вход шлейфа охраны (резерв)
+  #define CONFIG_GPIO_ALARM_ZONE_2    CONFIG_GPIO_X5        // Вход шлейфа охраны (резерв)
+  #define CONFIG_GPIO_ALARM_ZONE_3    CONFIG_GPIO_LINE_X7   // Вход контроля напряжения 
+  #define CONFIG_GPIO_ALARM_ZONE_4    CONFIG_GPIO_IR        // Вход ИК датчика (резерв)
+  #define CONFIG_GPIO_ALARM_LEVEL     0x01                  // уточнить
 
 #elif ROTATION
-  #define CONFIG_GPIO_TEMP_OUTDOOR    CONFIG_GPIO_TEMP_X3    // Датчик температуры внешний
+  // Светодиоды
+  #define CONFIG_GPIO_SYSTEM_LED      CONFIG_GPIO_LED_BLUE  // Системный Синий
+  #define CONFIG_GPIO_MODE_LED        CONFIG_GPIO_LED_GREEN // зел
+  #define CONFIG_GPIO_ALARM_FLASH     CONFIG_GPIO_LED_RED   // Красный мигающий сигнал аварии
+
+  // Датчики
+  #define CONFIG_GPIO_TEMP_BOILER     CONFIG_GPIO_TEMP_X1    // Датчик температуры первого блока
+  #define CONFIG_GPIO_TEMP_INDOOR     CONFIG_GPIO_TEMP_X2    // Датчик температуры второго блока
+  #define CONFIG_GPIO_TEMP_OUTDOOR    CONFIG_GPIO_TEMP_X3    // Датчик температуры помещения
+  
+  // Выходы
+  #define CONFIG_GPIO_RELAY_BOILER1    CONFIG_GPIO_RELAY_K1  // Выход на силовое реле первого блока
+  #define CONFIG_GPIO_RELAY_BOILER2    CONFIG_GPIO_RELAY_K2  // Выход на силовое реле второго блока
+  #define CONFIG_GPIO_RELAY_ALARM1     CONFIG_GPIO_RELAY_K4  // Выход на реле аварии первого блока
+  #define CONFIG_GPIO_RELAY_ALARM2     CONFIG_GPIO_RELAY_K3  // Выход на реле аварии второго блока
+
+  // Зоны сигнализации
+  #define CONFIG_GPIO_ALARM_ZONE_1    CONFIG_GPIO_X4        // Вход термостата (резерв)
+  #define CONFIG_GPIO_ALARM_ZONE_2    CONFIG_GPIO_X5        // Вход шлейфа охраны (резерв)
+  #define CONFIG_GPIO_ALARM_ZONE_3    CONFIG_GPIO_LINE_X6   // Вход контроля напряжения на реле первого блока
+  #define CONFIG_GPIO_ALARM_ZONE_4    CONFIG_GPIO_LINE_X7   // Вход контроля напряжения на реле второго блока
+  #define CONFIG_GPIO_ALARM_ZONE_5    CONFIG_GPIO_IR        // Вход ИК датчика (резерв)
+  #define CONFIG_GPIO_ALARM_LEVEL     0x01                  // уточнить
 
 #else // BOILER (Прототип К12)
   // Светодиоды
