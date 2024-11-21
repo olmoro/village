@@ -10,7 +10,8 @@
 // //#include "reBeep.h"   /* !!! reAlarm.cpp:20:10  */
 
 #include "meNEC.h"
-#include "reAlarm.h"
+//#include "reAlarm.h"
+#include "meAlarm.h"
 
 #ifdef __cplusplus
   extern "C" {

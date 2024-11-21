@@ -71,7 +71,7 @@ void alarmInitDevices()
 
   // Запускаем приемник ИК
   #if defined (CONFIG_GPIO_ALARM_ZONE_5) && (CONFIG_GPIO_ALARM_ZONE_5 > -1)
-    rxNEC_Init(CONFIG_GPIO_ALARM_ZONE_5, alarmTaskQueue());
+    meNEC_Init(CONFIG_GPIO_ALARM_ZONE_5, alarmTaskQueue());
   #endif // CONFIG_GPIO_ALARM_ZONE_5
 
 }

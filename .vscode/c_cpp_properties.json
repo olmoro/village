@@ -293,6 +293,10 @@
                 "E:/PlatformIO/zoo/libs/sensors",
                 "E:/PlatformIO/zoo/libs/system",
                 "E:/PlatformIO/zoo/libs/wifi",
+                "E:/PlatformIO/zoo/village/lib/infrared_tools/include",
+                "E:/PlatformIO/zoo/village/lib/infrared_tools/src",
+                "E:/PlatformIO/zoo/village/lib/meAlarm/include",
+                "E:/PlatformIO/zoo/village/lib/meAlarm/src",
                 ""
             ],
             "browse": {
@@ -583,6 +587,10 @@
                     "E:/PlatformIO/zoo/libs/sensors",
                     "E:/PlatformIO/zoo/libs/system",
                     "E:/PlatformIO/zoo/libs/wifi",
+                    "E:/PlatformIO/zoo/village/lib/infrared_tools/include",
+                    "E:/PlatformIO/zoo/village/lib/infrared_tools/src",
+                    "E:/PlatformIO/zoo/village/lib/meAlarm/include",
+                    "E:/PlatformIO/zoo/village/lib/meAlarm/src",
                     ""
                 ]
             },

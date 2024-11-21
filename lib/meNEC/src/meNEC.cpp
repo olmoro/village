@@ -17,7 +17,10 @@ static const char* logTAG = "RXNEC";
 //static gpio_num_t _gpioRx = GPIO_NUM_MAX;
 
 
-
+static volatile uint32_t _receivedValue = 0;
+static volatile uint16_t _receivedBitlength = 0;
+static volatile uint16_t _receivedDelay = 0;
+static volatile uint16_t _receivedProtocol = 0;
 
 
 
@@ -243,11 +246,11 @@ static void IRAM_ATTR rxIsrHandler(void* arg)
   // usTimePrev = usTimeCurr;
 }
 
-void rxNEC_Init(const uint8_t gpioRx, QueueHandle_t queueProc)
+void meNEC_Init(const uint8_t gpioRx, QueueHandle_t queueProc)
 {
   _gpioRx = static_cast<gpio_num_t>(gpioRx);
   
-  rlog_i(logTAG, "Initialization of rxNEC receiver on gpio #%d", _gpioRx);
+  rlog_i(logTAG, "Initialization of NEC receiver on gpio #%d", _gpioRx);
 
   // ERR_CHECK(gpio_install_isr_service(0), "Failed to install ISR service");
 
@@ -256,4 +259,58 @@ void rxNEC_Init(const uint8_t gpioRx, QueueHandle_t queueProc)
   ERR_CHECK(gpio_set_pull_mode(_gpioRx, GPIO_FLOATING), ERR_GPIO_SET_MODE);
   ERR_CHECK(gpio_set_intr_type(_gpioRx, GPIO_INTR_ANYEDGE), ERR_GPIO_SET_ISR);
   ERR_CHECK(gpio_isr_handler_add(_gpioRx, rxIsrHandler, queueProc), ERR_GPIO_SET_ISR);
+}
+
+void meNEC_Enable()
+{
+  esp_err_t err = gpio_intr_enable(_gpioRx);
+  if (err == ESP_OK) {
+    rlog_i(logTAG, "Receiver NEC started");
+  } else {
+    rlog_e(logTAG, "Failed to start NEC receiver");
+  };
+}
+
+void meNEC_Disable()
+{
+  esp_err_t err = gpio_intr_disable(_gpioRx);
+  if (err == ESP_OK) {
+    rlog_i(logTAG, "Receiver NEC stopped");
+  } else {
+    rlog_e(logTAG, "Failed to stop NEC receiver");
+  };
+}
+
+// ------------------------------------------------------------------------
+//                          Public functions
+// ------------------------------------------------------------------------
+
+bool meNEC_IsAvailable()
+{
+  return _receivedValue != 0;
+}
+
+void meNEC_ResetAvailable()
+{
+  _receivedValue = 0;
+}
+
+uint32_t meNEC_GetReceivedValue()
+{
+  return _receivedValue;
+}
+
+uint16_t meNEC_GetReceivedBitLength()
+{
+  return _receivedBitlength;
+}
+
+uint16_t meNEC_GetReceivedDelay()
+{
+  return _receivedDelay;
+}
+
+uint16_t meNEC_GetReceivedProtocol()
+{
+  return _receivedProtocol;
 }

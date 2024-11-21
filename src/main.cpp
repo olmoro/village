@@ -88,7 +88,7 @@ extern "C"
     sntpTaskCreate(true);
     vTaskDelay(1);
 
-    // Запуск и регистрация MQTT слиента
+    // Запуск и регистрация MQTT клиента
     mqttTaskStart(true);
     vTaskDelay(1);
 
