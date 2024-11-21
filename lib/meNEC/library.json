@@ -1,0 +1,17 @@
+{
+  "name": "meNEC",
+  "version": "3.1.0",
+  "description": "Module for receiving data from IR pult. Based on https://github.com/nopnop2002/esp-idf-irSend/blob/master/esp-idf-irAnalysis/main/main.c",
+  "keywords": "rxNEC",
+  "authors":
+  [
+    {
+      "name": "Olmoro",
+      "email": "",
+      "url": ""
+    }
+  ],
+  "license": "MIT",
+  "frameworks": ["espidf"],
+  "platforms": ["espressif32"]
+}

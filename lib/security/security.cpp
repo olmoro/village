@@ -68,6 +68,12 @@ void alarmInitDevices()
     rx433_Init(CONFIG_GPIO_RX433, alarmTaskQueue());
     rx433_Enable();
   #endif // CONFIG_GPIO_RX433
+
+  // Запускаем приемник ИК
+  #if defined (CONFIG_GPIO_ALARM_ZONE_5) && (CONFIG_GPIO_ALARM_ZONE_5 > -1)
+    rxNEC_Init(CONFIG_GPIO_ALARM_ZONE_5, alarmTaskQueue());
+  #endif // CONFIG_GPIO_ALARM_ZONE_5
+
 }
 
 void alarmInitSensors()
@@ -192,8 +198,22 @@ void alarmInitSensors()
       ASRS_REGISTER);
   #endif // CONFIG_GPIO_ALARM_ZONE_4
 
+  // Тревожные кнопки
+  alarmZoneHandle_t azButtons = alarmZoneAdd("Тревожные кнопки", "buttons", nullptr);
+  alarmResponsesSet(azButtons, ASM_DISABLED, ASRS_ALARM_SIREN, ASRS_ALARM_NOTIFY);
+  alarmResponsesSet(azButtons, ASM_ARMED, ASRS_ALARM_SIREN, ASRS_ALARM_NOTIFY);
+  alarmResponsesSet(azButtons, ASM_PERIMETER, ASRS_ALARM_SIREN, ASRS_ALARM_NOTIFY);
+  alarmResponsesSet(azButtons, ASM_OUTBUILDINGS, ASRS_ALARM_SIREN, ASRS_ALARM_NOTIFY);
+
+
+
     // Контроль ИК
-    // ...
+  // ИК пульт управления                old:   433 MHz пульты управления
+  alarmZoneHandle_t azRemoteControls = alarmZoneAdd("Пульты управления", "controls", nullptr);
+  alarmResponsesSet(azRemoteControls, ASM_DISABLED, ASRS_CONTROL, ASRS_CONTROL);
+  alarmResponsesSet(azRemoteControls, ASM_ARMED, ASRS_CONTROL, ASRS_CONTROL);
+  alarmResponsesSet(azRemoteControls, ASM_PERIMETER, ASRS_CONTROL, ASRS_CONTROL);
+  alarmResponsesSet(azRemoteControls, ASM_OUTBUILDINGS, ASRS_CONTROL, ASRS_CONTROL);
 
   rlog_i(logTAG, "Initialization of AFS sensors");
 
@@ -262,28 +282,114 @@ void alarmInitSensors()
     };
   #endif // CONFIG_GPIO_ALARM_ZONE_4
 
+  // ... 
 
+  // Беспроводные датчики и пульт 433 МГц в системе отсутствуют
 
+  // -----------------------------------------------------------------------------------
+  // пульты управления               433 МГц
+  // -----------------------------------------------------------------------------------
+  alarmSensorHandle_t asRC_R2 = alarmSensorAdd(     
+    AST_RX433_20A4C,                                // Тип датчика: беспроводной
+    "Пульт",                                        // Название пульта
+    "rc",                                           // Топик пульта
+    false,                                          // Локальные топики не используются
+    0x0004F9CB                                      // Адрес пульта
+  );
+  if (asRC_R2) {
+    alarmEventSet(asRC_R2, azRemoteControls, 0,     // Зона "пультов"
+      ASE_CTRL_OFF,                                 // Команда отключения режима охраны
+      0x01, NULL,                                   // Код команды 0x01, без сообщений
+      ALARM_VALUE_NONE, NULL,                       // Кода отмены нет, без сообщений
+      2,                                            // Должно придти как минимум 2 кодовых посылки для переключения
+      3*1000,                                       // Время автосброса: 3 секунды
+      0,                                            // Без повторной публикации состояния
+      false);                                       // Не требуется подтвеждение с других датчиков
+    alarmEventSet(asRC_R2, azRemoteControls, 1,     // Зона "пультов"
+      ASE_CTRL_ON,                                  // Команда включения режима охраны
+      0x08, NULL,                                   // Код команды 0x08, без сообщений
+      ALARM_VALUE_NONE, NULL,                       // Кода отмены нет, без сообщений
+      2,                                            // Должно придти как минимум 2 кодовых посылки для переключения
+      3*1000,                                       // Время автосброса: 3 секунды
+      0,                                            // Без повторной публикации состояния
+      false);                                       // Не требуется подтвеждение с других датчиков
+    alarmEventSet(asRC_R2, azRemoteControls, 2,     // Зона "пультов"
+      ASE_CTRL_PERIMETER,                           // Команда включения режима "периметр"
+      0x04, NULL,                                   // Код команды 0x04, без сообщений
+      ALARM_VALUE_NONE, NULL,                       // Кода отмены нет, без сообщений
+      2,                                            // Должно придти как минимум 2 кодовых посылки для переключения
+      3*1000,                                       // Время автосброса: 3 секунды
+      0,                                            // Без повторной публикации состояния
+      false);                                       // Не требуется подтвеждение с других датчиков
+    alarmEventSet(asRC_R2, azButtons, 3,            // Зона "тревожные кнопки"
+      ASE_ALARM,                                    // Команда "тревога"
+      0x02, NULL,                                   // Код команды 0x02, сообщение "🔴 Нажата тревожная кнопка"
+      ALARM_VALUE_NONE, NULL,                       // Кода отмены нет, без сообщений
+      2,                                            // Должно придти как минимум 2 кодовых посылки для переключения
+      3*1000,                                       // Время автосброса: 3 секунды
+      0,                                            // Без повторной публикации состояния
+      false);                                       // Не требуется подтвеждение с других датчиков
+  };
 
 
 
   rlog_i(logTAG, "Initialization of AFS completed");
-
 }
 
 // ------------------------------------------------------------------------
 //                             Внешние датчики 
+//                          в системе отсутствуют
 // ------------------------------------------------------------------------
+// static bool _extToiletPir  = false;
+// static bool _extKitchenPir = false;
 
-  
+// #define EXT_DATA_QOS                  2
+// #define EXT_DATA_FRIENDLY             "Состояние"
 
+// #define EXT_DATA_TOILET_PIR_ID         0xFF000001
+// #define EXT_DATA_TOILET_PIR_KEY       "toilet_pir"
+// #define EXT_DATA_TOILET_PIR_TOPIC     "security/home/toilet/pir"     // local/security/home/toilet/pir/status
+// #define EXT_DATA_TOILET_PIR_FRIENDLY  "Санузел"
 
+// #define EXT_DATA_KITCHEN_PIR_ID        0xFF000002
+// #define EXT_DATA_KITCHEN_PIR_KEY      "kitchen_pir"
+// #define EXT_DATA_KITCHEN_PIR_TOPIC    "security/home/kitchen/pir"     // local/security/home/kitchen/pir/status
+// #define EXT_DATA_KITCHEN_PIR_FRIENDLY "Кухня"
 
+// static void alarmExternalSensorsEventHandler(void* arg, esp_event_base_t event_base, int32_t event_id, void* event_data)
+// {
+//   if (*(uint32_t*)event_data == (uint32_t)&_extToiletPir) {
+//     if ((event_id == RE_PARAMS_CHANGED) || (event_id == RE_PARAMS_EQUALS)) {
+//       vTaskDelay(1);
+//       alarmPostQueueExtId(IDS_MQTT, EXT_DATA_TOILET_PIR_ID, _extToiletPir);
+//     };
+//   } else if (*(uint32_t*)event_data == (uint32_t)&_extKitchenPir) {
+//     if ((event_id == RE_PARAMS_CHANGED) || (event_id == RE_PARAMS_EQUALS)) {
+//       vTaskDelay(1);
+//       alarmPostQueueExtId(IDS_MQTT, EXT_DATA_KITCHEN_PIR_ID, _extKitchenPir);
+//     };
+//   };
+// }
 
+// static void alarmExternalSensorsInit()
+// {
+//   paramsGroupHandle_t extDataToilet = paramsRegisterGroup(nullptr, 
+//     EXT_DATA_TOILET_PIR_KEY, EXT_DATA_TOILET_PIR_TOPIC, EXT_DATA_TOILET_PIR_FRIENDLY);
+//   if (extDataToilet) {
+//     paramsRegisterValue(OPT_KIND_LOCDATA_ONLINE, OPT_TYPE_U8, nullptr, extDataToilet, 
+//       CONFIG_ALARM_MQTT_EVENTS_STATUS, EXT_DATA_FRIENDLY, EXT_DATA_QOS, &_extToiletPir);
+//   };
 
+//   paramsGroupHandle_t extDataKitchen = paramsRegisterGroup(nullptr, 
+//     EXT_DATA_KITCHEN_PIR_KEY, EXT_DATA_KITCHEN_PIR_TOPIC, EXT_DATA_KITCHEN_PIR_FRIENDLY);
+//   if (extDataKitchen) {
+//     paramsRegisterValue(OPT_KIND_LOCDATA_ONLINE, OPT_TYPE_U8, nullptr, extDataKitchen, 
+//       CONFIG_ALARM_MQTT_EVENTS_STATUS, EXT_DATA_FRIENDLY, EXT_DATA_QOS, &_extKitchenPir);
+//   };
 
-
-
+//   eventHandlerRegister(RE_PARAMS_EVENTS, RE_PARAMS_CHANGED, alarmExternalSensorsEventHandler, nullptr);
+//   eventHandlerRegister(RE_PARAMS_EVENTS, RE_PARAMS_EQUALS, alarmExternalSensorsEventHandler, nullptr);
+// }
 
 
 void alarmStart()
