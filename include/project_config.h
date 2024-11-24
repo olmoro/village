@@ -124,6 +124,8 @@
   //#define CONFIG_GPIO_RELAY_BOILER2   CONFIG_GPIO_RELAY_K2  // Выход на силовое реле (резерв)
   #define CONFIG_GPIO_ALARM_SIREN   CONFIG_GPIO_RELAY_K4  // Выход на реле сирены
   #define CONFIG_GPIO_ALARM_FLASH   CONFIG_GPIO_RELAY_K3  // Выход на реле маяка
+  #define CONFIG_GPIO_RMT_RX_GPIO   CONFIG_GPIO_TEST_PAD  // Тестовый выход на реле маяка
+
 
   // Зоны сигнализации
   #define CONFIG_GPIO_ALARM_ZONE_1  CONFIG_GPIO_DOOR_X4   // Вход "Двери"

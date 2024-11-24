@@ -5,18 +5,20 @@
 // RU: Максимальное количество событий, которое можно назначить на один сенсор
 #define CONFIG_ALARM_MAX_EVENTS 4
 
-// EN: GPIO address translation for I2C port expanders
-// RU: Преобразование адреса GPIO для I2C расширителей портов
-#define CONFIG_ALARM_IOEXP_SENSOR(bus, address, pin) ((((bus)+1) << 16) | ((address) << 8) | (pin))
+#if defined(CONFIG_GPIO_I2C) && (CONFIG_GPIO_I2C > -1)  // I2C и устройств на нём нет в системе
+  // Преобразование адреса GPIO для I2C расширителей портов 
+  #define CONFIG_ALARM_IOEXP_SENSOR(bus, address, pin) ((((bus)+1) << 16) | ((address) << 8) | (pin))
+#endif
 
 // EN: Interval for forced publication of events on MQTT (by timer)
 // RU: Интервал принудительной публикации событий на MQTT (по таймеру)
 #define CONFIG_ALARM_MQTT_INTERVAL_SEC 60
 
-// EN: Timeouts for resetting 2-wire smoke detectors after triggering
-// RU: Таймауты сброса 2-х проводных датчиков дыма после срабатывания
-#define CONFIG_ALARM_IOEXP_FIRE_RESET_DELAY_US 5000000
-#define CONFIG_ALARM_IOEXP_FIRE_RESET_RESET_US 5000000
+#if defined(CONFIG_GPIO_I2C) && (CONFIG_GPIO_I2C > -1)  // I2C и устройств на нём нет в системе
+  // Таймауты сброса 2-х проводных датчиков дыма после срабатывания
+  #define CONFIG_ALARM_IOEXP_FIRE_RESET_DELAY_US 5000000
+  #define CONFIG_ALARM_IOEXP_FIRE_RESET_RESET_US 5000000
+#endif
 
 // EN: Timeouts for maintaining the active state of sensors (for sensors that transmit only an alarm signal, without a reset signal)
 // RU: Таймауты поддержания активного состояния сенсоров (для датчиков, которые передают только сигнал тревоги, без сигнала сброса)
@@ -30,8 +32,7 @@
 #define CONFIG_ALARM_TIMEOUT_RF_TAMPER       1000*60*5
 #define CONFIG_ALARM_TIMEOUT_RF_LOW_BAT      1000*60*60*24
 
-// EN: Siren and flasher duration in seconds
-// RU: Длительность работы сирены и флешера в секундах
+// Длительность работы сирены и флешера в секундах
 #define CONFIG_ALARM_DURATION_SIREN 60
 #define CONFIG_ALARM_DURATION_FLASH 300
 
@@ -39,8 +40,8 @@
 // RU: Время на выход из помещения после включения режима охраны в секундах
 #define CONFIG_ALARM_EXIT_TIME 60
 
-// EN: Activate the alarm only after confirmation by any sensor within the specified time in ms. Set to 0 to disable
-// RU: Активировать тревогу только после подтверждения любым сенсором в течение заданного времени в мс. Поставьте 0 для отключения
+/* Активировать тревогу только после подтверждения любым сенсором в течение 
+   заданного времени в мс: 0 для отключения */
 #define CONFIG_ALARM_CONFIRMATION_TIMEOUT 60*1000
 
 // EN: Timeout of waiting for completion of a packet of codes from wireless sensors
@@ -52,22 +53,19 @@
 #define CONFIG_ALARM_THRESHOLD_RF 1
 #define CONFIG_ALARM_THRESHOLD_ISR UINT16_MAX
 
-// EN: Date and time formats
-// RU: Форматы даты и времени
+// Форматы даты и времени
 #define CONFIG_ALARM_TIMESTAMP_LONG "%d.%m.%Y %H:%M:%S"
 #define CONFIG_ALARM_TIMESTAMP_LONG_BUF_SIZE 20
 #define CONFIG_ALARM_TIMESTAMP_SHORT "%d.%m.%y %H:%M"
 #define CONFIG_ALARM_TIMESTAMP_SHORT_BUF_SIZE 15
 
-// EN: Notifications in Telegram
-// RU: Уведомления в Telegram
+// Уведомления в Telegram
 #define CONFIG_ALARM_NOTIFY_PRIORITY_MODE_CHANGE MP_CRITICAL
 #define CONFIG_ALARM_NOTIFY_PRIORITY_ALARM MP_CRITICAL
 #define CONFIG_ALARM_NOTIFY_PRIORITY_COMMAND_UNDEFINED MP_REDUCED
 #define CONFIG_ALARM_NOTIFY_PRIORITY_SENSOR_UNDEFINED MP_REDUCED
 
-// EN: MQTT - publishing status
-// RU: MQTT - публикация статуса
+// MQTT - публикация статуса
 #define CONFIG_ALARM_MQTT_SECURITY_TOPIC "security"
 
 #define CONFIG_ALARM_MQTT_STATUS_TOPIC "status"
@@ -82,8 +80,7 @@
 #define CONFIG_ALARM_MQTT_STATUS_JSON_ANNUNCIATOR "{\"siren\":%d,\"flasher\":%d,\"summary\":%d}"
 #define CONFIG_ALARM_MQTT_STATUS_EOL CONFIG_JSON_CHAR_EOL
 
-// EN: MQTT - publishing events
-// RU: MQTT - публикация событий
+// MQTT - публикация событий
 #define CONFIG_ALARM_MQTT_EVENTS_TOPIC "events"
 #define CONFIG_ALARM_MQTT_EVENTS_LOCAL 0
 #define CONFIG_ALARM_MQTT_EVENTS_QOS 2
