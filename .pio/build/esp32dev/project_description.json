@@ -1,7 +1,7 @@
 {
     "version":            "1.1",
     "project_name":       "village",
-    "project_version":    "2e35401-dirty",
+    "project_version":    "d967404-dirty",
     "project_path":       "E:/PlatformIO/zoo/village",
     "idf_path":           "C:/Users/olmor/.platformio/packages/framework-espidf",
     "build_dir":          "E:/PlatformIO/zoo/village/.pio/build/esp32dev",

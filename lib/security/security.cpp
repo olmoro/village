@@ -24,8 +24,9 @@ static reGPIO gpioAlarm1(CONFIG_GPIO_ALARM_ZONE_1, CONFIG_GPIO_ALARM_LEVEL, fals
 static reGPIO gpioAlarm2(CONFIG_GPIO_ALARM_ZONE_2, CONFIG_GPIO_ALARM_LEVEL, false, true, CONFIG_BUTTON_DEBOUNCE_TIME_US, nullptr);
 static reGPIO gpioAlarm3(CONFIG_GPIO_ALARM_ZONE_3, CONFIG_GPIO_ALARM_LEVEL, false, true, CONFIG_BUTTON_DEBOUNCE_TIME_US, nullptr);
 static reGPIO gpioAlarm4(CONFIG_GPIO_ALARM_ZONE_4, CONFIG_GPIO_ALARM_LEVEL, false, true, CONFIG_BUTTON_DEBOUNCE_TIME_US, nullptr);
-// static reGPIO gpioAlarm5(CONFIG_GPIO_ALARM_ZONE_5, CONFIG_GPIO_ALARM_LEVEL, false, true, CONFIG_BUTTON_DEBOUNCE_TIME_US, nullptr);
-
+#if defined (CONFIG_GPIO_ALARM_ZONE_5) && (CONFIG_GPIO_ALARM_ZONE_5 > -1)
+  static reGPIO gpioAlarm5(CONFIG_GPIO_ALARM_ZONE_5, CONFIG_GPIO_ALARM_LEVEL, false, true, CONFIG_BUTTON_DEBOUNCE_TIME_US, nullptr);
+#endif // CONFIG_GPIO_ALARM_ZONE_5
 // ------------------------------------------------------------------------
 //                             Инициализация 
 // ------------------------------------------------------------------------
@@ -69,10 +70,10 @@ void alarmInitDevices()
     rx433_Enable();
   #endif // CONFIG_GPIO_RX433
 
-  // Запускаем приемник ИК
-  #if defined (CONFIG_GPIO_ALARM_ZONE_5) && (CONFIG_GPIO_ALARM_ZONE_5 > -1)
-    meNEC_Init(CONFIG_GPIO_ALARM_ZONE_5, alarmTaskQueue());
-  #endif // CONFIG_GPIO_ALARM_ZONE_5
+  // // Запускаем приемник ИК
+  // #if defined (CONFIG_GPIO_ALARM_ZONE_5) && (CONFIG_GPIO_ALARM_ZONE_5 > -1)
+  //   meNEC_Init(CONFIG_GPIO_ALARM_ZONE_5, alarmTaskQueue());
+  // #endif // CONFIG_GPIO_ALARM_ZONE_5
 
 }
 

@@ -14,7 +14,8 @@
 // ------------------------------------------------------------------------
 //                              Версии 
 // ------------------------------------------------------------------------
-#define APP_VERSION "VILLAGE-20241121.003"
+#define APP_VERSION "VILLAGE-20241125.004"
+// 20241119.004: Зона охраны 5 переводится в резерв
 // 20241119.003: Библиотеки alarm и def_alarm перенесены в проект
 // 20241119.002: Новая плата URC-2E.54
 // 20241110.001: Общие параметры вынесены в common_config.h
@@ -23,6 +24,9 @@
 // ------------------------------------------------------------------------
 //                             TARGET
 // ------------------------------------------------------------------------
+
+#define EXAMPLE_RMT_RX
+
 /* BOILER - прототип выбирается по умолчанию */
 //#define FREEZER   // Вариант автомата морозильника
 //#define PUMPER    // Вариант автомата подкачки
@@ -49,7 +53,7 @@
   #define CONFIG_GPIO_ALARM_ZONE_2    CONFIG_GPIO_X5        // Вход шлейфа охраны (резерв)
   //#define CONFIG_GPIO_ALARM_ZONE_3    CONFIG_GPIO_POWER_X6   // Вход контроля напряжения на реле 
   #define CONFIG_GPIO_ALARM_ZONE_4    CONFIG_GPIO_POWER_X7   // Вход контроля напряжения насоса
-  #define CONFIG_GPIO_ALARM_ZONE_5    CONFIG_GPIO_IR        // Вход ИК датчика (резерв)
+  #define CONFIG_GPIO_ALARM_ZONE_5    CONFIG_GPIO_RX433        // резерв
   #define CONFIG_GPIO_ALARM_LEVEL     0x01                  // уточнить
 
 #elif SOLAR
@@ -96,7 +100,7 @@
   #define CONFIG_GPIO_ALARM_ZONE_2    CONFIG_GPIO_X5        // Вход шлейфа охраны (резерв)
   #define CONFIG_GPIO_ALARM_ZONE_3    CONFIG_GPIO_POWER_X6   // Вход контроля напряжения на реле первого блока
   #define CONFIG_GPIO_ALARM_ZONE_4    CONFIG_GPIO_POWER_X7   // Вход контроля напряжения на реле второго блока
-  #define CONFIG_GPIO_ALARM_ZONE_5    CONFIG_GPIO_IR        // Вход ИК датчика (резерв)
+  #define CONFIG_GPIO_ALARM_ZONE_5    CONFIG_GPIO_RX433        // резерв
   #define CONFIG_GPIO_ALARM_LEVEL     0x01                  // уточнить
 
 #else // BOILER (Прототип К12)
@@ -124,7 +128,7 @@
   //#define CONFIG_GPIO_RELAY_BOILER2   CONFIG_GPIO_RELAY_K2  // Выход на силовое реле (резерв)
   #define CONFIG_GPIO_ALARM_SIREN   CONFIG_GPIO_RELAY_K4  // Выход на реле сирены
   #define CONFIG_GPIO_ALARM_FLASH   CONFIG_GPIO_RELAY_K3  // Выход на реле маяка
-  #define CONFIG_GPIO_RMT_RX_GPIO   CONFIG_GPIO_TEST_PAD  // Тестовый выход на реле маяка
+  #define CONFIG_GPIO_RMT_RX_GPIO   CONFIG_GPIO_TEST_PAD  // Тестовый выход
 
 
   // Зоны сигнализации
@@ -132,7 +136,7 @@
   #define CONFIG_GPIO_ALARM_ZONE_2  CONFIG_GPIO_FIRE_X5   // Вход шлейфа охраны (резерв)
   #define CONFIG_GPIO_ALARM_ZONE_3  CONFIG_GPIO_POWER_X6  // Вход контроля напряжения на реле бойлера
   #define CONFIG_GPIO_ALARM_ZONE_4  CONFIG_GPIO_POWER_X7  // Вход контроля напряжения (резерв)
-  #define CONFIG_GPIO_ALARM_ZONE_5  CONFIG_GPIO_IR        // Вход ИК датчика (резерв)
+  //#define CONFIG_GPIO_ALARM_ZONE_5  CONFIG_GPIO_RX433        // Резерв (-1)
   #define CONFIG_GPIO_ALARM_LEVEL   0x01                  // уточнить
 
 #endif
