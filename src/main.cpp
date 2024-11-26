@@ -1,6 +1,6 @@
 /*
    Дистанционный контроль температуры в доме
-   2024.11.25
+   2024.11.26
 */
 
 #include "stdlib.h"
@@ -36,7 +36,7 @@
 #endif // CONFIG_GPIO_BUZZER
 #include "sensors.h"
 #include "security.h"
-#include "nec.h"
+//#include "nec.h"
 
 // Главная функция
 extern "C"
@@ -119,11 +119,11 @@ extern "C"
     sensorsTaskStart();
     vTaskDelay(1);
 
-    // Запуск службы контроллера ИК 
-    necTaskStart();
-    vTaskDelay(1);
+    // // Запуск службы контроллера ИК 
+    // necTaskStart();
+    // vTaskDelay(1);
 
-    // Запуск службы сигнализации
+    // Запуск службы сигнализации (Включая приёмник ИК)
     alarmStart();
     vTaskDelay(1);
 

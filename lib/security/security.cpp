@@ -4,7 +4,7 @@
 #include "common_config.h"
 #include "def_alarm.h"
 #include "def_consts.h"
-#include "rTypes.h"
+#include "mTypes.h"
 #include "reGpio.h"
 #include "reLed.h"
 #include "reEvents.h"

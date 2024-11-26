@@ -14,7 +14,6 @@
                 "E:/PlatformIO/zoo/libs/peripherals/reGpio/src",
                 "E:/PlatformIO/zoo/village/lib/meAlarm/include",
                 "E:/PlatformIO/zoo/village/lib/meAlarm/src",
-                "E:/PlatformIO/zoo/village/lib/nec",
                 "E:/PlatformIO/zoo/village/lib/sensors",
                 "E:/PlatformIO/zoo/libs/peripherals/reLoadCtrl/include",
                 "E:/PlatformIO/zoo/libs/peripherals/reLoadCtrl/src",
@@ -56,8 +55,8 @@
                 "E:/PlatformIO/zoo/libs/system/reNvs/src",
                 "E:/PlatformIO/zoo/libs/system/reEsp32/include",
                 "E:/PlatformIO/zoo/libs/system/reEsp32/src",
-                "E:/PlatformIO/zoo/libs/system/rTypes/include",
-                "E:/PlatformIO/zoo/libs/system/rTypes/src",
+                "E:/PlatformIO/zoo/libs/system/mTypes/include",
+                "E:/PlatformIO/zoo/libs/system/mTypes/src",
                 "E:/PlatformIO/zoo/libs/peripherals/reLed/include",
                 "E:/PlatformIO/zoo/libs/peripherals/reLed/src",
                 "E:/PlatformIO/zoo/libs/system/rStrings/include",
@@ -296,6 +295,7 @@
                 "E:/PlatformIO/zoo/libs/wifi",
                 "E:/PlatformIO/zoo/village/lib/infrared_tools/include",
                 "E:/PlatformIO/zoo/village/lib/infrared_tools/src",
+                "E:/PlatformIO/zoo/village/lib/rxir",
                 ""
             ],
             "browse": {
@@ -307,7 +307,6 @@
                     "E:/PlatformIO/zoo/libs/peripherals/reGpio/src",
                     "E:/PlatformIO/zoo/village/lib/meAlarm/include",
                     "E:/PlatformIO/zoo/village/lib/meAlarm/src",
-                    "E:/PlatformIO/zoo/village/lib/nec",
                     "E:/PlatformIO/zoo/village/lib/sensors",
                     "E:/PlatformIO/zoo/libs/peripherals/reLoadCtrl/include",
                     "E:/PlatformIO/zoo/libs/peripherals/reLoadCtrl/src",
@@ -349,8 +348,8 @@
                     "E:/PlatformIO/zoo/libs/system/reNvs/src",
                     "E:/PlatformIO/zoo/libs/system/reEsp32/include",
                     "E:/PlatformIO/zoo/libs/system/reEsp32/src",
-                    "E:/PlatformIO/zoo/libs/system/rTypes/include",
-                    "E:/PlatformIO/zoo/libs/system/rTypes/src",
+                    "E:/PlatformIO/zoo/libs/system/mTypes/include",
+                    "E:/PlatformIO/zoo/libs/system/mTypes/src",
                     "E:/PlatformIO/zoo/libs/peripherals/reLed/include",
                     "E:/PlatformIO/zoo/libs/peripherals/reLed/src",
                     "E:/PlatformIO/zoo/libs/system/rStrings/include",
@@ -589,6 +588,7 @@
                     "E:/PlatformIO/zoo/libs/wifi",
                     "E:/PlatformIO/zoo/village/lib/infrared_tools/include",
                     "E:/PlatformIO/zoo/village/lib/infrared_tools/src",
+                    "E:/PlatformIO/zoo/village/lib/rxir",
                     ""
                 ]
             },
