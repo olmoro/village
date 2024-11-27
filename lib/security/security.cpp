@@ -10,8 +10,7 @@
 #include "reEvents.h"
 #include "reParams.h"
 #include "rLog.h"
-  //  #include "reBeep.h"   /* !!! reAlarm.cpp:20:10  */
-
+#include "rxir.h"   
 
 static const char* logTAG = "ALARM";
 
@@ -70,10 +69,10 @@ void alarmInitDevices()
     rx433_Enable();
   #endif // CONFIG_GPIO_RX433
 
-  // // Запускаем приемник ИК
-  // #if defined (CONFIG_GPIO_ALARM_ZONE_5) && (CONFIG_GPIO_ALARM_ZONE_5 > -1)
-  //   meNEC_Init(CONFIG_GPIO_ALARM_ZONE_5, alarmTaskQueue());
-  // #endif // CONFIG_GPIO_ALARM_ZONE_5
+  // Запускаем приемник ИК
+  #if defined (CONFIG_GPIO_ALARM_ZONE_5) && (CONFIG_GPIO_ALARM_ZONE_5 > -1)
+    rxIR_Init(CONFIG_GPIO_ALARM_ZONE_5, alarmTaskQueue());
+  #endif // CONFIG_GPIO_ALARM_ZONE_5
 
 }
 
@@ -210,7 +209,7 @@ void alarmInitSensors()
 
     // Контроль ИК
   // ИК пульт управления                old:   433 MHz пульты управления
-  alarmZoneHandle_t azRemoteControls = alarmZoneAdd("Пульты управления", "controls", nullptr);
+  alarmZoneHandle_t azRemoteControls = alarmZoneAdd("Пульт управления", "controls", nullptr);
   alarmResponsesSet(azRemoteControls, ASM_DISABLED, ASRS_CONTROL, ASRS_CONTROL);
   alarmResponsesSet(azRemoteControls, ASM_ARMED, ASRS_CONTROL, ASRS_CONTROL);
   alarmResponsesSet(azRemoteControls, ASM_PERIMETER, ASRS_CONTROL, ASRS_CONTROL);

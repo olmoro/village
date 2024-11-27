@@ -7,26 +7,27 @@
 #include "rxir.h"
 //#include "reRx433.h"
 #include <stdint.h>
-//#include <stdio.h>
+#include <stdio.h>
 #include "time.h"
 #include "esp_err.h"
 #include "esp_timer.h"
-#include <driver/gpio.h>
+//#include <driver/gpio.h>
 #include "rLog.h"
 #include "mTypes.h"
 
-#include <stdio.h>
-#include <inttypes.h>
-#include <string.h>
-#include "sdkconfig.h"
-#include "freertos/FreeRTOS.h"
-#include "freertos/task.h"
-#include "esp_log.h"
-#include "driver/rmt.h"
-#include "ir_tools.h"
+// #include <stdio.h>
+ #include <inttypes.h>
+ #include <string.h>
+ #include "sdkconfig.h"
+ #include "freertos/FreeRTOS.h"
+ #include "freertos/task.h"
+ #include "esp_log.h"
+ #include "driver/rmt.h"
+ //#include "driver/rmt_rx.h"
+ #include "ir_tools.h"
 
-#define CONFIG_RMT_RX_CHANNEL 4
-#define CONFIG_RMT_RX_GPIO 35
+#define CONFIG_RMT_RX_CHANNEL (rmt_channel_t)4
+#define CONFIG_RMT_RX_GPIO (gpio_num_t)35
 
 static const char* logTAG = "RXIR}";
 
@@ -47,6 +48,7 @@ static gpio_num_t _gpioRx = GPIO_NUM_MAX;
 
 
 static void IRAM_ATTR rxIsrHandler(void* arg)   //static void example_ir_rx_task(void *arg)
+//void IRAM_ATTR rxIsrHandler(void* arg)   //static void example_ir_rx_task(void *arg)
 {
   ESP_LOGD(pcTaskGetName(0), "Start");
   uint32_t addr = 0;
@@ -76,7 +78,8 @@ static void IRAM_ATTR rxIsrHandler(void* arg)   //static void example_ir_rx_task
           length /= 4; // one RMT = 4 Bytes
           if (ir_parser->input(ir_parser, items, length) == ESP_OK) {
               if (ir_parser->get_scan_code(ir_parser, &addr, &cmd, &repeat) == ESP_OK) {
-                  ESP_LOGI(TAG, "Scan Code %s --- addr: 0x%04"PRIx32" cmd: 0x%04"PRIx32, repeat ? "(repeat)" : "", addr, cmd);
+                  //ESP_LOGI(TAG, "Scan Code %s --- addr: 0x%04"PRIx32" cmd: 0x%04"PRIx32, repeat ? "(repeat)" : "", addr, cmd);
+                  rlog_i(logTAG, "Scan Code %s --- addr: 0x%04" PRIx32 " cmd: 0x%04" PRIx32, repeat ? "(repeat)" : "", addr, cmd);
               }
           }
           //after parsing the data, return spaces to ringbuffer.

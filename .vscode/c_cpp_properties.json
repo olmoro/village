@@ -10,6 +10,9 @@
             "includePath": [
                 "E:/PlatformIO/zoo/village/src",
                 "E:/PlatformIO/zoo/village/lib/security",
+                "E:/PlatformIO/zoo/village/lib/rxir",
+                "E:/PlatformIO/zoo/libs/infrared_tools/include",
+                "E:/PlatformIO/zoo/libs/infrared_tools/src",
                 "E:/PlatformIO/zoo/libs/peripherals/reGpio/include",
                 "E:/PlatformIO/zoo/libs/peripherals/reGpio/src",
                 "E:/PlatformIO/zoo/village/lib/meAlarm/include",
@@ -287,15 +290,12 @@
                 "E:/PlatformIO/zoo/libs/.vscode",
                 "E:/PlatformIO/zoo/libs/certs",
                 "E:/PlatformIO/zoo/libs/clouds",
-                "E:/PlatformIO/zoo/libs/infrared_tools/include",
-                "E:/PlatformIO/zoo/libs/infrared_tools/src",
                 "E:/PlatformIO/zoo/libs/peripherals",
                 "E:/PlatformIO/zoo/libs/sensors",
                 "E:/PlatformIO/zoo/libs/system",
                 "E:/PlatformIO/zoo/libs/wifi",
                 "E:/PlatformIO/zoo/village/lib/infrared_tools/include",
                 "E:/PlatformIO/zoo/village/lib/infrared_tools/src",
-                "E:/PlatformIO/zoo/village/lib/rxir",
                 ""
             ],
             "browse": {
@@ -303,6 +303,9 @@
                 "path": [
                     "E:/PlatformIO/zoo/village/src",
                     "E:/PlatformIO/zoo/village/lib/security",
+                    "E:/PlatformIO/zoo/village/lib/rxir",
+                    "E:/PlatformIO/zoo/libs/infrared_tools/include",
+                    "E:/PlatformIO/zoo/libs/infrared_tools/src",
                     "E:/PlatformIO/zoo/libs/peripherals/reGpio/include",
                     "E:/PlatformIO/zoo/libs/peripherals/reGpio/src",
                     "E:/PlatformIO/zoo/village/lib/meAlarm/include",
@@ -580,15 +583,12 @@
                     "E:/PlatformIO/zoo/libs/.vscode",
                     "E:/PlatformIO/zoo/libs/certs",
                     "E:/PlatformIO/zoo/libs/clouds",
-                    "E:/PlatformIO/zoo/libs/infrared_tools/include",
-                    "E:/PlatformIO/zoo/libs/infrared_tools/src",
                     "E:/PlatformIO/zoo/libs/peripherals",
                     "E:/PlatformIO/zoo/libs/sensors",
                     "E:/PlatformIO/zoo/libs/system",
                     "E:/PlatformIO/zoo/libs/wifi",
                     "E:/PlatformIO/zoo/village/lib/infrared_tools/include",
                     "E:/PlatformIO/zoo/village/lib/infrared_tools/src",
-                    "E:/PlatformIO/zoo/village/lib/rxir",
                     ""
                 ]
             },

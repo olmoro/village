@@ -14,8 +14,8 @@
 // ------------------------------------------------------------------------
 //                              Версии 
 // ------------------------------------------------------------------------
-#define APP_VERSION "VILLAGE-20241126.005"
-// 20241126.005: Попытка интегрирования ИК вместо радиоканала
+#define APP_VERSION "VILLAGE-20241127.005"
+// 20241127.005: Попытка интегрирования ИК вместо радиоканала
 // 20241125.004: Зона охраны 5 переводится в резерв
 // 20241119.003: Библиотеки alarm и def_alarm перенесены в проект
 // 20241119.002: Новая плата URC-2E.54
@@ -137,7 +137,7 @@
   #define CONFIG_GPIO_ALARM_ZONE_2  CONFIG_GPIO_FIRE_X5   // Вход шлейфа охраны (резерв)
   #define CONFIG_GPIO_ALARM_ZONE_3  CONFIG_GPIO_POWER_X6  // Вход контроля напряжения на реле бойлера
   #define CONFIG_GPIO_ALARM_ZONE_4  CONFIG_GPIO_POWER_X7  // Вход контроля напряжения (резерв)
-  //#define CONFIG_GPIO_ALARM_ZONE_5  CONFIG_GPIO_RX433        // Резерв (-1)
+  #define CONFIG_GPIO_ALARM_ZONE_5  CONFIG_GPIO_IR        // Вход ИК датчика
   #define CONFIG_GPIO_ALARM_LEVEL   0x01                  // уточнить
 
 #endif
