@@ -20,8 +20,8 @@
 #include "reRangeMonitor.h"
 #include "reLoadCtrl.h"
 #if CONFIG_TELEGRAM_ENABLE
-#include "reTgSend.h"
-  #endif // CONFIG_TELEGRAM_ENABLE
+  #include "reTgSend.h"
+#endif // CONFIG_TELEGRAM_ENABLE
 #if CONFIG_DATASEND_ENABLE
   #include "reDataSend.h"
 #endif // CONFIG_DATASEND_ENABLE

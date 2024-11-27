@@ -36,7 +36,6 @@
 #endif // CONFIG_GPIO_BUZZER
 #include "sensors.h"
 #include "security.h"
-//#include "nec.h"
 
 // Главная функция
 extern "C"

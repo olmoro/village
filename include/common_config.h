@@ -14,7 +14,7 @@
   #define CONFIG_GPIO_FIRE_X5       26    // Вход X5 Пожар
   #define CONFIG_GPIO_POWER_X6      32    // Вход контроля напряжения на X6
   #define CONFIG_GPIO_POWER_X7      33    // Вход контроля напряжения на X7
-  #define CONFIG_GPIO_IR            35    // Вход ИК датчика
+  #define CONFIG_GPIO_RX_IR         35    // Вход ИК датчика
 
   // Датчики температуры, все DS18B20
   #define CONFIG_GPIO_TEMP_X1       25    // Датчик температуры, подключен к X1

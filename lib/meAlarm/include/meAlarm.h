@@ -58,8 +58,8 @@ static const uint16_t ASRS_POWER_OFF    = ASR_ALARM_INC | ASR_MQTT_EVENT | ASR_M
  * */
 typedef enum {
   AST_WIRED = 0,          // Проводная зона
-  AST_RX433_GENERIC,      // Беспроводной сенсор, без выделения команд
-  AST_RX433_20A4C,        // Беспроводной сенсор, общая длина кода 24 бит: 20 бит - адрес, последние 4 бита - команда
+  AST_RXIR_GENERIC,         //AST_RX433_GENERIC,      // Беспроводной сенсор, без выделения команд
+  AST_RXIR_16A_16C,           //AST_RX433_20A4C,        // Беспроводной сенсор, общая длина кода 24 бит: 20 бит - адрес, последние 4 бита - команда
   AST_MQTT                // Виртуальный сенсор, получение данных с других устройств через локальный MQTT брокер
 } alarm_sensor_type_t;
 
@@ -189,7 +189,7 @@ typedef struct alarmSensor_t {
 // Ссылка-указатель на параметры датчика
 typedef alarmSensor_t *alarmSensorHandle_t;
 
-// Данные для обаботки события
+// Данные для обработки события
 typedef struct {
   alarmSensorHandle_t sensor;
   alarmEventHandle_t event;
@@ -223,8 +223,8 @@ bool alarmSystemInit(cb_alarm_change_mode_t cb_mode);
 bool alarmTaskCreate(ledQueue_t siren, ledQueue_t flasher, ledQueue_t buzzer, ledQueue_t ledAlarm, ledQueue_t ledRx433, cb_alarm_change_mode_t cb_mode);
 
 /**
- * Приостановать задачу
- * @brief Приостановать задачу ОПС
+ * Приостановить задачу
+ * @brief Приостановить задачу ОПС
  * */
 bool alarmTaskSuspend();
 

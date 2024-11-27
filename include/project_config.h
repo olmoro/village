@@ -137,7 +137,7 @@
   #define CONFIG_GPIO_ALARM_ZONE_2  CONFIG_GPIO_FIRE_X5   // Вход шлейфа охраны (резерв)
   #define CONFIG_GPIO_ALARM_ZONE_3  CONFIG_GPIO_POWER_X6  // Вход контроля напряжения на реле бойлера
   #define CONFIG_GPIO_ALARM_ZONE_4  CONFIG_GPIO_POWER_X7  // Вход контроля напряжения (резерв)
-  #define CONFIG_GPIO_ALARM_ZONE_5  CONFIG_GPIO_IR        // Вход ИК датчика
+  #define CONFIG_GPIO_ALARM_ZONE_5  CONFIG_GPIO_RX_IR     // Вход ИК датчика
   #define CONFIG_GPIO_ALARM_LEVEL   0x01                  // уточнить
 
 #endif

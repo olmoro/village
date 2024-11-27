@@ -1280,9 +1280,9 @@ void alarmEventSet(alarmSensorHandle_t sensor, alarmZoneHandle_t zone, uint8_t i
 bool alarmEventCheckAddress(input_data_t* data, alarmSensorHandle_t sensor)
 {
   switch (sensor->type) {
-    case AST_RX433_GENERIC:
+    case AST_RXIR_GENERIC:                //AST_RX433_GENERIC:
       return (data->source == IDS_RX433) && (data->rx433.value == sensor->address);
-    case AST_RX433_20A4C:
+    case AST_RXIR_16A_16C:                //AST_RX433_20A4C:
       return (data->source == IDS_RX433) && ((data->rx433.value >> 4) == sensor->address);
     case AST_WIRED:
       return (data->source == IDS_GPIO) && (((data->gpio.bus << 16) | (data->gpio.address << 8) | data->gpio.pin) == sensor->address);
@@ -1297,9 +1297,9 @@ bool alarmEventCheckAddress(input_data_t* data, alarmSensorHandle_t sensor)
 static bool alarmEventCheckValueSet(input_data_t* data, alarm_sensor_type_t type, alarmEventHandle_t event)
 {
   switch (type) {
-    case AST_RX433_GENERIC:
+    case AST_RXIR_GENERIC:                //AST_RX433_GENERIC:
       return true;
-    case AST_RX433_20A4C:
+    case AST_RXIR_16A_16C:                //AST_RX433_20A4C:
       return (data->rx433.value & 0x0f) == event->value_set;
     case AST_MQTT:
       return data->ext.value == event->value_set;
@@ -1312,9 +1312,9 @@ static bool alarmEventCheckValueSet(input_data_t* data, alarm_sensor_type_t type
 static bool alarmEventCheckValueClr(input_data_t* data, alarm_sensor_type_t type, alarmEventHandle_t event)
 {
   switch (type) {
-    case AST_RX433_GENERIC:
+    case AST_RXIR_GENERIC:                //AST_RX433_GENERIC:
       return false;
-    case AST_RX433_20A4C:
+    case AST_RXIR_16A_16C:                //AST_RX433_20A4C:
       return (data->rx433.value & 0x0f) == event->value_clr;
     case AST_MQTT:
       return data->ext.value == event->value_clr;

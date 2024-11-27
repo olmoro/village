@@ -21,8 +21,6 @@
 extern "C" {
 #endif
 
-  //void IRAM_ATTR rxIsrHandler(void* arg);
-
 void rxIR_Init(const uint8_t gpioRx, QueueHandle_t queueProc);
 void rxIR_Enable();
 void rxIR_Disable();
@@ -32,7 +30,7 @@ void rxIR_ResetAvailable();
 uint32_t rxIR_GetReceivedValue();
 uint16_t rxIR_GetReceivedBitLength();
 uint16_t rxIR_GetReceivedDelay();
-uint16_t rxIr_GetReceivedProtocol();
+uint16_t rxIR_GetReceivedProtocol();
 
 #ifdef __cplusplus
 }
