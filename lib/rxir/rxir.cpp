@@ -1,5 +1,5 @@
 /*
-* 2024.11.26 Не закончено
+* 2024.11.27 Не закончено
 * 
 */
 
@@ -48,7 +48,6 @@ static gpio_num_t _gpioRx = GPIO_NUM_MAX;
 
 
 static void IRAM_ATTR rxIsrHandler(void* arg)   //static void example_ir_rx_task(void *arg)
-//void IRAM_ATTR rxIsrHandler(void* arg)   //static void example_ir_rx_task(void *arg)
 {
   ESP_LOGD(pcTaskGetName(0), "Start");
   uint32_t addr = 0;
