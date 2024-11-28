@@ -15,9 +15,9 @@
 #include "reLed.h"
 #include "reEsp32.h"
 
-#if defined(CONFIG_GPIO_I2C) && (CONFIG_GPIO_I2C > -1)
-  #include "reRx433.h"
-#endif // CONFIG_GPIO_I2C
+// #if defined(CONFIG_GPIO_I2C) && (CONFIG_GPIO_I2C > -1)
+//   #include "rerxIR.h"
+// #endif // CONFIG_GPIO_I2C
 
 #include "reParams.h"
 #include "reEvents.h"
@@ -38,7 +38,7 @@ static const char* alarmTaskName = "alarm";
 
 TaskHandle_t _alarmTask;
 QueueHandle_t _alarmQueue = nullptr;
-ledQueue_t _ledRx433 = nullptr;
+ledQueue_t _ledRxIr = nullptr;
 ledQueue_t _ledAlarm = nullptr;
 ledQueue_t _buzzer = nullptr;
 
@@ -61,7 +61,7 @@ uint8_t _alarmQueueStorage[CONFIG_ALARM_QUEUE_SIZE * ALARM_QUEUE_ITEM_SIZE];
 static alarm_mode_t _alarmMode = ASM_DISABLED;
 static paramsEntryHandle_t _alarmParamMode = nullptr;
 static cb_alarm_change_mode_t _alarmOnChangeMode = nullptr;
-static bool _alarmStoreUnknownRx433Codes = false;
+static bool _alarmStoreUnknownRxIRCodes = false;
 static uint32_t _alarmCount = 0;
 static time_t _alarmLastEvent = 0;
 static time_t _alarmLastAlarm = 0;
@@ -780,10 +780,10 @@ static void alarmParamsEventHandler(void* arg, esp_event_base_t event_base, int3
 static void alarmTimeEventHandler(void* arg, esp_event_base_t event_base, int32_t event_id, void* event_data)
 {
   if (event_id == RE_TIME_SILENT_MODE_ON) {
-    if (_ledRx433) ledTaskSend(_ledRx433, lmEnable, 1, 0, 0);
+    if (_ledRxIr) ledTaskSend(_ledRxIr, lmEnable, 1, 0, 0);
     if (_ledAlarm) ledTaskSend(_ledAlarm, lmEnable, 1, 0, 0);
   } else if (event_id == RE_TIME_SILENT_MODE_OFF) {
-    if (_ledRx433) ledTaskSend(_ledRx433, lmEnable, 0, 0, 0);
+    if (_ledRxIr) ledTaskSend(_ledRxIr, lmEnable, 0, 0, 0);
     if (_ledAlarm) ledTaskSend(_ledAlarm, lmEnable, 0, 0, 0);
   };
 }
@@ -834,7 +834,7 @@ static bool alarmParamsRegister()
     0, 600);
 
   paramsRegisterValue(OPT_KIND_PARAMETER, OPT_TYPE_U8, nullptr, pgSecurity, 
-    CONFIG_ALARM_PARAMS_FIX_RX433_CODES_KEY, CONFIG_ALARM_PARAMS_FIX_RX433_CODES_FRIENDLY, CONFIG_ALARM_PARAMS_QOS, &_alarmStoreUnknownRx433Codes);
+    CONFIG_ALARM_PARAMS_FIX_RXIR_CODES_KEY, CONFIG_ALARM_PARAMS_FIX_RXIR_CODES_FRIENDLY, CONFIG_ALARM_PARAMS_QOS, &_alarmStoreUnknownRxIRCodes);
 
   return eventHandlerRegister(RE_PARAMS_EVENTS, ESP_EVENT_ANY_ID, &alarmParamsEventHandler, nullptr) 
       && eventHandlerRegister(RE_SYSTEM_EVENTS, RE_SYS_STARTED, alarmStartEventHandler, nullptr);
@@ -1280,10 +1280,10 @@ void alarmEventSet(alarmSensorHandle_t sensor, alarmZoneHandle_t zone, uint8_t i
 bool alarmEventCheckAddress(input_data_t* data, alarmSensorHandle_t sensor)
 {
   switch (sensor->type) {
-    case AST_RXIR_GENERIC:                //AST_RX433_GENERIC:
-      return (data->source == IDS_RX433) && (data->rx433.value == sensor->address);
-    case AST_RXIR_16A_16C:                //AST_RX433_20A4C:
-      return (data->source == IDS_RX433) && ((data->rx433.value >> 4) == sensor->address);
+    case AST_RXIR_GENERIC:
+      return (data->source == IDS_RXIR) && (data->rxIR.value == sensor->address);
+    case AST_RXIR_16A_16C:
+      return (data->source == IDS_RXIR) && ((data->rxIR.value >> 4) == sensor->address);
     case AST_WIRED:
       return (data->source == IDS_GPIO) && (((data->gpio.bus << 16) | (data->gpio.address << 8) | data->gpio.pin) == sensor->address);
     case AST_MQTT:
@@ -1297,10 +1297,10 @@ bool alarmEventCheckAddress(input_data_t* data, alarmSensorHandle_t sensor)
 static bool alarmEventCheckValueSet(input_data_t* data, alarm_sensor_type_t type, alarmEventHandle_t event)
 {
   switch (type) {
-    case AST_RXIR_GENERIC:                //AST_RX433_GENERIC:
+    case AST_RXIR_GENERIC:
       return true;
-    case AST_RXIR_16A_16C:                //AST_RX433_20A4C:
-      return (data->rx433.value & 0x0f) == event->value_set;
+    case AST_RXIR_16A_16C:
+      return (data->rxIR.value & 0x0f) == event->value_set;
     case AST_MQTT:
       return data->ext.value == event->value_set;
     default:
@@ -1312,10 +1312,10 @@ static bool alarmEventCheckValueSet(input_data_t* data, alarm_sensor_type_t type
 static bool alarmEventCheckValueClr(input_data_t* data, alarm_sensor_type_t type, alarmEventHandle_t event)
 {
   switch (type) {
-    case AST_RXIR_GENERIC:                //AST_RX433_GENERIC:
+    case AST_RXIR_GENERIC:
       return false;
-    case AST_RXIR_16A_16C:                //AST_RX433_20A4C:
-      return (data->rx433.value & 0x0f) == event->value_clr;
+    case AST_RXIR_16A_16C:
+      return (data->rxIR.value & 0x0f) == event->value_clr;
     case AST_MQTT:
       return data->ext.value == event->value_clr;
     default:
@@ -1330,9 +1330,9 @@ static bool alarmProcessIncomingData(input_data_t* data, bool end_of_packet)
   if (data->source == IDS_GPIO) {
     rlog_i(logTAG, "Incoming message:: end of packet: %d, source: GPIO, bus: %d, address: 0x%02X, pin: %d, full address: 0x%.8X, command: 0x%02X", 
       end_of_packet, data->gpio.bus, data->gpio.address, data->gpio.pin, ((data->gpio.bus << 16) | (data->gpio.address << 8) | data->gpio.pin), data->gpio.value);
-  } else if (data->source == IDS_RX433) {
-    rlog_i(logTAG, "Incoming message:: end of packet: %d, source: RX433, value: 0x%.8X, address: 0x%.8X, command: 0x%02X, count: %d", 
-      end_of_packet, data->rx433.value, data->rx433.value >> 4, data->rx433.value & 0x0f, data->count);
+  } else if (data->source == IDS_RXIR) {
+    rlog_i(logTAG, "Incoming message:: end of packet: %d, source: RXIR, value: 0x%.8X, address: 0x%.8X, command: 0x%02X, count: %d", 
+      end_of_packet, data->rxIR.value, data->rxIR.value >> 4, data->rxIR.value & 0x0f, data->count);
   } else if (data->source == IDS_MQTT) {
     rlog_i(logTAG, "Incoming message:: end of packet: %d, source: MQTT, value: 0x%.8X, id: 0x%.8X", 
       end_of_packet, data->ext.value, data->ext.id);
@@ -1378,16 +1378,16 @@ static bool alarmProcessIncomingData(input_data_t* data, bool end_of_packet)
     };
   };
 
-  if (end_of_packet && (data->source == IDS_RX433) && (data->rx433.value > 0xffff)) {
-    if (_alarmStoreUnknownRx433Codes && esp_heap_free_check() && statesMqttIsEnabled()) {
-      char* sid = malloc_stringf("0x%.8X", data->rx433.value);
+  if (end_of_packet && (data->source == IDS_RXIR) && (data->rxIR.value > 0xffff)) {
+    if (_alarmStoreUnknownRxIRCodes && esp_heap_free_check() && statesMqttIsEnabled()) {
+      char* sid = malloc_stringf("0x%.8X", data->rxIR.value);
       if (sid) {
-        char* topic = mqttGetTopicDevice2(statesMqttIsPrimary(), CONFIG_ALARM_MQTT_RX433_UNKNOWN_LOCAL, CONFIG_ALARM_MQTT_RX433_UNKNOWN_TOPIC, sid);
+        char* topic = mqttGetTopicDevice2(statesMqttIsPrimary(), CONFIG_ALARM_MQTT_RXIR_UNKNOWN_LOCAL, CONFIG_ALARM_MQTT_RXIR_UNKNOWN_TOPIC, sid);
         if (topic) {
           time_t currtime = time(nullptr);
           char timestamp[CONFIG_FORMAT_STRFTIME_DTS_BUFFER_SIZE];
           time2str_empty(CONFIG_FORMAT_DTS, &currtime, timestamp, sizeof(timestamp));
-          mqttPublish(topic, timestamp, CONFIG_ALARM_MQTT_RX433_UNKNOWN_QOS, CONFIG_ALARM_MQTT_RX433_UNKNOWN_RETAINED, false, false);
+          mqttPublish(topic, timestamp, CONFIG_ALARM_MQTT_RXIR_UNKNOWN_QOS, CONFIG_ALARM_MQTT_RXIR_UNKNOWN_RETAINED, false, false);
           free(topic);
         };
         free(sid);
@@ -1395,17 +1395,17 @@ static bool alarmProcessIncomingData(input_data_t* data, bool end_of_packet)
     };
     if (sensor) {
       // Sensor found, but no command defined
-      rlog_w(logTAG, "Failed to identify command [0x%.8X] for sensor [ %s ]!", data->rx433.value, sensor->name);
+      rlog_w(logTAG, "Failed to identify command [0x%.8X] for sensor [ %s ]!", data->rxIR.value, sensor->name);
       #if CONFIG_TELEGRAM_ENABLE && defined(CONFIG_NOTIFY_TELEGRAM_ALARM_COMMAND_UNDEFINED) && CONFIG_NOTIFY_TELEGRAM_ALARM_COMMAND_UNDEFINED
         tgSend(MK_SERVICE, CONFIG_ALARM_NOTIFY_PRIORITY_COMMAND_UNDEFINED, CONFIG_NOTIFY_TELEGRAM_ALARM_ALERT_COMMAND_UNDEFINED, CONFIG_TELEGRAM_DEVICE, 
-          CONFIG_NOTIFY_TELEGRAM_ALARM_COMMAND_UNDEFINED_TEMPLATE, sensor->name, data->rx433.value, data->rx433.value >> 4, data->rx433.value & 0x0f);
+          CONFIG_NOTIFY_TELEGRAM_ALARM_COMMAND_UNDEFINED_TEMPLATE, sensor->name, data->rxIR.value, data->rxIR.value >> 4, data->rxIR.value & 0x0f);
       #endif // CONFIG_TELEGRAM_ENABLE
     } else {
       // Sensor not found
-      rlog_w(logTAG, "Failed to identify RX433 signal [0x%.8X]!", data->rx433.value);
+      rlog_w(logTAG, "Failed to identify RXIR signal [0x%.8X]!", data->rxIR.value);
       #if CONFIG_TELEGRAM_ENABLE && defined(CONFIG_NOTIFY_TELEGRAM_ALARM_SENSOR_UNDEFINED) && CONFIG_NOTIFY_TELEGRAM_ALARM_SENSOR_UNDEFINED
         tgSend(MK_SERVICE, CONFIG_ALARM_NOTIFY_PRIORITY_SENSOR_UNDEFINED, CONFIG_NOTIFY_TELEGRAM_ALARM_ALERT_SENSOR_UNDEFINED, CONFIG_TELEGRAM_DEVICE, 
-          CONFIG_NOTIFY_TELEGRAM_ALARM_SENSOR_UNDEFINED_TEMPLATE, data->rx433.value, data->rx433.value >> 4, data->rx433.value & 0x0f);
+          CONFIG_NOTIFY_TELEGRAM_ALARM_SENSOR_UNDEFINED_TEMPLATE, data->rxIR.value, data->rxIR.value >> 4, data->rxIR.value & 0x0f);
       #endif // CONFIG_TELEGRAM_ENABLE
     };
   };
@@ -1793,16 +1793,16 @@ static void alarmTaskExecPeriodic()
 
 static void alarmTaskExec(void *pvParameters)
 {
-  static input_data_t data, buf433;
-  static bool rx433_processed = false;
+  static input_data_t data, bufIR;
+  static bool rxIR_processed = false;
   static TickType_t queueWait = pdMS_TO_TICKS(1000);
 
-  memset(&buf433, 0, sizeof(input_data_t));
+  memset(&bufIR, 0, sizeof(input_data_t));
   while (1) {
     if (xQueueReceive(_alarmQueue, &data, queueWait) == pdPASS) {
       // Send signal to LED
-      if ((data.source == IDS_RX433) && (_ledRx433)) {
-        ledTaskSend(_ledRx433, lmFlash, CONFIG_ALARM_INCOMING_QUANTITY, CONFIG_ALARM_INCOMING_DURATION, CONFIG_ALARM_INCOMING_INTERVAL);
+      if ((data.source == IDS_RXIR) && (_ledRxIr)) {
+        ledTaskSend(_ledRxIr, lmFlash, CONFIG_ALARM_INCOMING_QUANTITY, CONFIG_ALARM_INCOMING_DURATION, CONFIG_ALARM_INCOMING_INTERVAL);
       };
 
       // Handling signals from GPIO
@@ -1812,31 +1812,31 @@ static void alarmTaskExec(void *pvParameters)
         alarmTaskExecPeriodic();
       }
       
-      // Handling packets from RX433
-      else if (data.source == IDS_RX433) {
+      // Handling packets from RXIR
+      else if (data.source == IDS_RXIR) {
         // If this is not the first signal in the packet...
-        if ((data.source == buf433.source) && (data.rx433.value == buf433.rx433.value)) {
-          buf433.count++;
+        if ((data.source == bufIR.source) && (data.rxIR.value == bufIR.rxIR.value)) {
+          bufIR.count++;
           // If the number of signals has exceeded the threshold, send it for processing
-          if (!rx433_processed && (buf433.count == CONFIG_ALARM_THRESHOLD_RF)) {
-            // rlog_d(logTAG, "Process RX433 signal (threshold): protocol=%d, value=0x%.8X, count=%d", buf433.rx433.value, buf433.rx433.value, buf433.count);
-            rx433_processed = alarmProcessIncomingData(&buf433, false);
+          if (!rxIR_processed && (bufIR.count == CONFIG_ALARM_THRESHOLD_RF)) {
+            // rlog_d(logTAG, "Process RXIR signal (threshold): protocol=%d, value=0x%.8X, count=%d", bufIR.rxIR.value, bufIR.rxIR.value, bufIR.count);
+            rxIR_processed = alarmProcessIncomingData(&bufIR, false);
           };
         } else {
           // If the previous signal was not processed, send it for processing
-          if ((buf433.source == IDS_RX433) && (buf433.rx433.value > 0) && (buf433.count > 0) && !rx433_processed) {
-            // rlog_d(logTAG, "Process RX433 signal (changed): protocol=%d, value=0x%.8X, count=%d", buf433.rx433.value, buf433.rx433.value, buf433.count);
-            alarmProcessIncomingData(&buf433, true);
+          if ((bufIR.source == IDS_RXIR) && (bufIR.rxIR.value > 0) && (bufIR.count > 0) && !rxIR_processed) {
+            // rlog_d(logTAG, "Process RXIR signal (changed): protocol=%d, value=0x%.8X, count=%d", bufIR.rxIR.value, bufIR.rxIR.value, bufIR.count);
+            alarmProcessIncomingData(&bufIR, true);
           };
           // Set new data to last and reset the counter (we don't really need it), instead we will count the number of packets
-          memcpy(&buf433, &data, sizeof(input_data_t));
-          buf433.count = 1;
-          rx433_processed = false;
-          // rlog_d(logTAG, "Init new RX433 signal: protocol=%d, value=0x%.8X, count=%d", buf433.rx433.value, buf433.rx433.value, buf433.count);
+          memcpy(&bufIR, &data, sizeof(input_data_t));
+          bufIR.count = 1;
+          rxIR_processed = false;
+          // rlog_d(logTAG, "Init new RXIR signal: protocol=%d, value=0x%.8X, count=%d", bufIR.rxIR.value, bufIR.rxIR.value, bufIR.count);
           // If the threshold is not set, process the signal immediately
-          if (buf433.count == CONFIG_ALARM_THRESHOLD_RF) {
-            // rlog_d(logTAG, "Process RX433 signal (threshold): protocol=%d, value=0x%.8X, count=%d", buf433.rx433.value, buf433.rx433.value, buf433.count);
-            rx433_processed = alarmProcessIncomingData(&buf433, false);
+          if (bufIR.count == CONFIG_ALARM_THRESHOLD_RF) {
+            // rlog_d(logTAG, "Process RXIR signal (threshold): protocol=%d, value=0x%.8X, count=%d", bufIR.rxIR.value, bufIR.rxIR.value, bufIR.count);
+            rxIR_processed = alarmProcessIncomingData(&bufIR, false);
           };
         };
         
@@ -1858,13 +1858,13 @@ static void alarmTaskExec(void *pvParameters)
       };
     } else {
       // End of transmission, push the previous signal for further processing
-      if (!rx433_processed) {
-        if ((buf433.source == IDS_RX433) && (buf433.rx433.value > 0) && (buf433.count > 0)) {
-          // rlog_d(logTAG, "Process RX433 signal (end of packet): protocol=%d, value=0x%.8X, count=%d", buf433.rx433.value, buf433.rx433.value, buf433.count);
-          alarmProcessIncomingData(&buf433, true);
+      if (!rxIR_processed) {
+        if ((bufIR.source == IDS_RXIR) && (bufIR.rxIR.value > 0) && (bufIR.count > 0)) {
+          // rlog_d(logTAG, "Process RXIR signal (end of packet): protocol=%d, value=0x%.8X, count=%d", bufIR.rxIR.value, bufIR.rxIR.value, bufIR.count);
+          alarmProcessIncomingData(&bufIR, true);
         };
-        rx433_processed = true;
-        memset(&buf433, 0, sizeof(input_data_t));
+        rxIR_processed = true;
+        memset(&bufIR, 0, sizeof(input_data_t));
       };
 
       alarmTaskExecPeriodic();
@@ -1875,17 +1875,17 @@ static void alarmTaskExec(void *pvParameters)
 }
 
 // ------------------------------------------------------------------------
-// ---------------------------------------------------- Task routines ----------------------------------------------------
+//                            Task routines
 // ------------------------------------------------------------------------
 
-bool alarmTaskCreate(ledQueue_t siren, ledQueue_t flasher, ledQueue_t buzzer, ledQueue_t ledAlarm, ledQueue_t ledRx433, cb_alarm_change_mode_t cb_mode)
+bool alarmTaskCreate(ledQueue_t siren, ledQueue_t flasher, ledQueue_t buzzer, ledQueue_t ledAlarm, ledQueue_t ledRxIr, cb_alarm_change_mode_t cb_mode)
 {
   if (!_alarmTask) {
     _siren = siren;
     _flasher = flasher;
     _buzzer = buzzer;
     _ledAlarm = ledAlarm;
-    _ledRx433 = ledRx433;
+    _ledRxIr = ledRxIr;
     
     alarmZonesInit();
     alarmSensorsInit();

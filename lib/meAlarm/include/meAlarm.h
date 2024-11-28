@@ -58,8 +58,8 @@ static const uint16_t ASRS_POWER_OFF    = ASR_ALARM_INC | ASR_MQTT_EVENT | ASR_M
  * */
 typedef enum {
   AST_WIRED = 0,          // Проводная зона
-  AST_RXIR_GENERIC,         //AST_RX433_GENERIC,      // Беспроводной сенсор, без выделения команд
-  AST_RXIR_16A_16C,           //AST_RX433_20A4C,        // Беспроводной сенсор, общая длина кода 24 бит: 20 бит - адрес, последние 4 бита - команда
+  AST_RXIR_GENERIC,       //AST_RX433_GENERIC,      // Беспроводной сенсор, без выделения команд
+  AST_RXIR_16A_16C,       //AST_RX433_20A4C,        // Беспроводной сенсор, общая длина кода 24 бит: 20 бит - адрес, последние 4 бита - команда
   AST_MQTT                // Виртуальный сенсор, получение данных с других устройств через локальный MQTT брокер
 } alarm_sensor_type_t;
 
@@ -216,11 +216,11 @@ bool alarmSystemInit(cb_alarm_change_mode_t cb_mode);
  * @param flasher Ссылка-указатель на виртуальный "светодиод", отвечающий за включение светового маяка
  * @param buzzer Ссылка-указатель на виртуальный "светодиод", отвечающий за зуммер
  * @param ledAlarm Ссылка-указатель на светодиод, индицирующий режим работы
- * @param ledRx433 Ссылка-указатель на светодиод, индицирующий получение события с приемника RX433. Можно использовать тот же, что и ledAlarm
+ * @param ledRxIr Ссылка-указатель на светодиод, индицирующий получение события с приемника RXIR. Можно использовать тот же, что и ledAlarm
  * @param cb_mode Функция обратного вызова, вызываемая при изменении режима охраны
  * @return Успех или неуспех
  * */
-bool alarmTaskCreate(ledQueue_t siren, ledQueue_t flasher, ledQueue_t buzzer, ledQueue_t ledAlarm, ledQueue_t ledRx433, cb_alarm_change_mode_t cb_mode);
+bool alarmTaskCreate(ledQueue_t siren, ledQueue_t flasher, ledQueue_t buzzer, ledQueue_t ledAlarm, ledQueue_t ledRxIr, cb_alarm_change_mode_t cb_mode);
 
 /**
  * Приостановить задачу
