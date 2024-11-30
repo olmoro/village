@@ -1,6 +1,6 @@
 /*
    Дистанционный контроль температуры в доме
-   2024.11.27
+   2024.11.30
 */
 
 #include "stdlib.h"
@@ -21,7 +21,7 @@
 #include "reMqtt.h"
 #include "reSysInfo.h"
 #include "reScheduler.h"
-#include "reCerts.h"
+#include "meCerts.h"
 #if CONFIG_PINGER_ENABLE
   #include "rePinger.h"
 #endif // CONFIG_PINGER_ENABLE

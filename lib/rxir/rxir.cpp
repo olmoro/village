@@ -12,7 +12,9 @@
 #include "esp_err.h"
 #include "esp_timer.h"
 //#include <driver/gpio.h>
-#include "rLog.h"
+#include "rLog.h"     /* https://kotyara12.ru/iot/esp_log/
+                        
+                        */
 #include "mTypes.h"
 
 // #include <stdio.h>
@@ -21,7 +23,12 @@
  #include "sdkconfig.h"
  #include "freertos/FreeRTOS.h"
  #include "freertos/task.h"
- #include "esp_log.h"
+ #include "esp_log.h" /* https://kotyara12.ru/iot/esp_log/
+                        ESP_LOGE – ошибка (минимальный уровень детализации)
+                        ESP_LOGW – предупреждение
+                        ESP_LOGI – информация
+                        ESP_LOGD – отладочные сообщения
+                        ESP_LOGV – всё подряд (максимальный уровень детализации) */
  #include "driver/rmt.h"
  //#include "driver/rmt_rx.h"
  #include "ir_tools.h"
@@ -29,7 +36,7 @@
 #define CONFIG_RMT_RX_CHANNEL (rmt_channel_t)4
 #define CONFIG_RMT_RX_GPIO (gpio_num_t)35
 
-static const char* logTAG = "RXIR}";
+static const char* logTAG = "RXIR";  // static const char* TAG = “MyModule“;
 
 #define ERR_CHECK(err, str) if (err != ESP_OK) rlog_e(logTAG, "%s: #%d %s", str, err, esp_err_to_name(err));
 #define ERR_GPIO_SET_MODE "Failed to set GPIO mode"
