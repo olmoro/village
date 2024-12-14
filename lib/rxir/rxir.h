@@ -23,10 +23,10 @@ extern "C" {
 
 void rxIR_Init(const uint8_t gpioRx, QueueHandle_t queueProc);
 void rxIR_Enable();
-void rxIR_Disable();
+//void rxIR_Disable();
 
-bool rxIR_IsAvailable();
-void rxIR_ResetAvailable();
+//bool rxIR_IsAvailable();
+//void rxIR_ResetAvailable();
 uint32_t rxIR_GetReceivedValue();
 uint16_t rxIR_GetReceivedBitLength();
 uint16_t rxIR_GetReceivedDelay();
