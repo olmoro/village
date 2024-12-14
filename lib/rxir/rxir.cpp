@@ -138,6 +138,12 @@ static void IRAM_ATTR rxIsrHandler(void* arg)   //static void example_ir_rx_task
           #if CONFIG_IR_PROTOCOL_NEC
           if(((uint8_t)addr == (uint8_t)~(addr>>8)) && ((uint8_t)cmd == (uint8_t)~(cmd>>8)))
           {
+// ============ moro
+            _receivedValue = cmd;
+            _receivedBitlength = length;
+            // static volatile uint16_t _receivedDelay = 0;
+            _receivedProtocol = ir_parser;
+// ============ 
             rlog_i(TAG, "Scan Code %s --- addr: 0x%02x, cmd: 0x%02x", repeat ? "(repeat)" : "",
                   (uint8_t)addr, (uint8_t)cmd);
           }
