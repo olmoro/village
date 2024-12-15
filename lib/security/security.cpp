@@ -69,11 +69,12 @@ void alarmInitDevices()
     rx433_Enable();
   #endif // CONFIG_GPIO_RX433
 
-  // Запускаем приемник ИК
-  #if defined (CONFIG_GPIO_RX_IR) && (CONFIG_GPIO_RX_IR > -1)
-//    rxIR_Init(CONFIG_GPIO_RX_IR, alarmTaskQueue());
-//  rxIR_Enable();
-  #endif // CONFIG_GPIO_RX_IR
+  // // Запускаем приемник ИК
+  // #if defined (CONFIG_GPIO_RX_IR) && (CONFIG_GPIO_RX_IR > -1)
+
+  //   rxIR_Init(CONFIG_GPIO_RX_IR, alarmTaskQueue());
+  //   rxIR_Enable();
+  // #endif // CONFIG_GPIO_RX_IR
 }
 
 void alarmInitSensors()

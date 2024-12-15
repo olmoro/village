@@ -57,8 +57,8 @@ static volatile uint16_t _receivedProtocol = 0;
 
 static gpio_num_t _gpioRx = GPIO_NUM_MAX;
 
-//
-static void IRAM_ATTR rxIsrHandler(void* arg)   //static void example_ir_rx_task(void *arg)
+// static void IRAM_ATTR rxIsrHandler(void* arg)
+static void ir_rx_task(void *arg)
 {
   rlog_d(pcTaskGetName(0), "Start");
   uint32_t addr = 0;
@@ -142,7 +142,6 @@ static void IRAM_ATTR rxIsrHandler(void* arg)   //static void example_ir_rx_task
             _receivedValue = cmd;
             _receivedBitlength = length;
             // static volatile uint16_t _receivedDelay = 0;
-            _receivedProtocol = ir_parser;
 // ============ 
             rlog_i(TAG, "Scan Code %s --- addr: 0x%02x, cmd: 0x%02x", repeat ? "(repeat)" : "",
                   (uint8_t)addr, (uint8_t)cmd);
@@ -174,32 +173,43 @@ static void IRAM_ATTR rxIsrHandler(void* arg)   //static void example_ir_rx_task
 
 
 
-// Инициализация порта ИК приёмника
-void rxIR_Init(const uint8_t gpioRx, QueueHandle_t queueProc)
-{
-  _gpioRx = static_cast<gpio_num_t>(gpioRx);
+// // Инициализация порта ИК приёмника
+// void rxIR_Init(const uint8_t gpioRx, QueueHandle_t queueProc)
+// {
+//   _gpioRx = static_cast<gpio_num_t>(gpioRx);
   
-  rlog_i(TAG, "Initialization of IR receiver on gpio #%d", _gpioRx);
+//   rlog_i(TAG, "Initialization of IR receiver on gpio #%d", _gpioRx);
 
-  // ERR_CHECK(gpio_install_isr_service(0), "Failed to install ISR service");
+//   // ERR_CHECK(gpio_install_isr_service(0), "Failed to install ISR service");
 
-  gpio_reset_pin(_gpioRx);
-  ERR_CHECK(gpio_set_direction(_gpioRx, GPIO_MODE_INPUT), ERR_GPIO_SET_MODE);
-  ERR_CHECK(gpio_set_pull_mode(_gpioRx, GPIO_FLOATING), ERR_GPIO_SET_MODE);
-  ERR_CHECK(gpio_set_intr_type(_gpioRx, GPIO_INTR_ANYEDGE), ERR_GPIO_SET_ISR);
-  ERR_CHECK(gpio_isr_handler_add(_gpioRx, rxIsrHandler, queueProc), ERR_GPIO_SET_ISR);
-}
+//   gpio_reset_pin(_gpioRx);
+//   ERR_CHECK(gpio_set_direction(_gpioRx, GPIO_MODE_INPUT), ERR_GPIO_SET_MODE);
+//   ERR_CHECK(gpio_set_pull_mode(_gpioRx, GPIO_FLOATING), ERR_GPIO_SET_MODE);
+//   ERR_CHECK(gpio_set_intr_type(_gpioRx, GPIO_INTR_ANYEDGE), ERR_GPIO_SET_ISR);
+//   //ERR_CHECK(gpio_isr_handler_add(_gpioRx, rxIsrHandler, queueProc), ERR_GPIO_SET_ISR);
+//   ERR_CHECK(gpio_isr_handler_add(_gpioRx, rxIsrHandler, queueProc), ERR_GPIO_SET_ISR);
+// }
 
-// Разрешение прерываний порта ИК приёмника
-void rxIR_Enable()
+void irTaskStart()
 {
-  esp_err_t err = gpio_intr_enable(_gpioRx);
-  if (err == ESP_OK) {
-    rlog_i(TAG, "Receiver IR started");
-  } else {
-    rlog_e(TAG, "Failed to start IR receiver");
-  };
+  // led ...
+
+  xTaskCreate(ir_rx_task, "ir_rx_task", 2048, NULL, 10, NULL);
 }
+
+
+
+
+// // Разрешение прерываний порта ИК приёмника
+// void rxIR_Enable()
+// {
+//   esp_err_t err = gpio_intr_enable(_gpioRx);
+//   if (err == ESP_OK) {
+//     rlog_i(TAG, "Receiver IR started");
+//   } else {
+//     rlog_e(TAG, "Failed to start IR receiver");
+//   };
+// }
 
 // void rxIR_Disable()
 // {

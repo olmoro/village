@@ -21,8 +21,12 @@
 extern "C" {
 #endif
 
-void rxIR_Init(const uint8_t gpioRx, QueueHandle_t queueProc);
-void rxIR_Enable();
+void irTaskStart();
+
+
+
+//void rxIR_Init(const uint8_t gpioRx, QueueHandle_t queueProc);
+//void rxIR_Enable();
 //void rxIR_Disable();
 
 //bool rxIR_IsAvailable();

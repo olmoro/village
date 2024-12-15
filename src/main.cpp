@@ -34,6 +34,7 @@
 #if defined(CONFIG_GPIO_BUZZER) && (CONFIG_GPIO_BUZZER > -1)
   #include "reBeep.h"
 #endif // CONFIG_GPIO_BUZZER
+#include "rxir.h"
 #include "sensors.h"
 #include "security.h"
 
@@ -118,9 +119,9 @@ extern "C"
     sensorsTaskStart();
     vTaskDelay(1);
 
-    // // Запуск службы контроллера ИК 
-    // necTaskStart();
-    // vTaskDelay(1);
+    // Запуск службы контроллера ИК 
+    irTaskStart();
+    vTaskDelay(1);
 
     // Запуск службы сигнализации (Включая приёмник ИК)
     alarmStart();
