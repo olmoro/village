@@ -1,6 +1,6 @@
 /*
    Дистанционный контроль температуры в доме
-   2024.11.30
+   2024.12.15
 */
 
 #include "stdlib.h"
@@ -34,7 +34,7 @@
 #if defined(CONFIG_GPIO_BUZZER) && (CONFIG_GPIO_BUZZER > -1)
   #include "reBeep.h"
 #endif // CONFIG_GPIO_BUZZER
-#include "rxir.h"
+// #include "rxir.h"
 #include "sensors.h"
 #include "security.h"
 
@@ -119,11 +119,11 @@ extern "C"
     sensorsTaskStart();
     vTaskDelay(1);
 
-    // Запуск службы контроллера ИК 
-    irTaskStart();
-    vTaskDelay(1);
+    // // Запуск службы контроллера ИК 
+    // irTaskStart();
+    // vTaskDelay(1);
 
-    // Запуск службы сигнализации (Включая приёмник ИК)
+    // Запуск службы сигнализации
     alarmStart();
     vTaskDelay(1);
 
