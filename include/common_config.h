@@ -127,7 +127,8 @@
 #define CONFIG_IR_RX_STATIC_ALLOCATION 1
 // Размер стека для задачи
 #define CONFIG_IR_RX_TASK_STACK_SIZE 2*1024
-
+// RU: Размер очереди для задачи чтения данных с пульта
+#define CONFIG_ALARM_QUEUE_SIZE 32
 
 
 

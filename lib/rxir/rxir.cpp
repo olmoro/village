@@ -3,6 +3,9 @@
 * 
 */
 
+    #include "meAlarm.h"
+
+
 #include "sensors.h"
 #include "rxir.h"
 #include <stdint.h>
@@ -19,6 +22,7 @@
 #include "sdkconfig.h"
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
+#include "freertos/queue.h"
 
 #include "driver/rmt.h"   // rmt_rx.h не совместим
 #include "ir_tools.h"
@@ -28,12 +32,10 @@
 
 //#define CONFIG_IR_PROTOCOL_NEC 1    // moro
 //
-//static const char* logTAG = "RXIR";  // static const char* TAG = “MyModule“;
-static const char* TAG = "IR_RX";  // static const char* TAG = “MyModule“;
-    static const char* ir_rx_TaskName = "irPult";
-    //static TaskHandle_t _ir_rx_Task;
-    static TaskHandle_t _ir_rx_Task;
-    static bool _sensorsNeedStore = false; // ???
+static const char* TAG = "IR_RX";
+static const char* ir_rx_TaskName = "irPult";
+static TaskHandle_t _ir_rx_Task;
+static bool _sensorsNeedStore = false; // ???
 
 //#define ERR_CHECK(err, str) if (err != ESP_OK) rlog_e(logTAG, "%s: #%d %s", str, err, esp_err_to_name(err));
 #define ERR_CHECK(err, str) if (err != ESP_OK) rlog_e(TAG, "%s: #%d %s", str, err, esp_err_to_name(err));
@@ -67,7 +69,6 @@ static volatile uint16_t command = 0;
 
 static gpio_num_t _gpioRx = GPIO_NUM_MAX;
 
-//static void ir_rx_Task(void *arg)
 static void ir_rx_TaskExec(void *arg)
 {
   rlog_d(pcTaskGetName(0), "Start");
@@ -157,7 +158,25 @@ static void ir_rx_TaskExec(void *arg)
             my_data.command = _cmd;
             my_data.repeat = repeat;
 
-  //      xQueueSend(rxQueue, &my_data, portMAX_DELAY);
+            ir_rx_ResetAvailable();              // reset recieved value
+
+              // we have not woken a task at the start of the ISR
+            BaseType_t xHigherPriorityTaskWoken = pdFALSE;
+              // публиковать данные
+            xQueueSendFromISR(rxQueue, &my_data, &xHigherPriorityTaskWoken);
+
+              // now the buffer is empty we can switch context if necessary.
+            if (xHigherPriorityTaskWoken) 
+            {
+                portYIELD_FROM_ISR();
+            } else {
+              // reset recieved value
+              ir_rx_ResetAvailable();
+            };
+
+    //    xQueueSend(rxQueue, &my_data, portMAX_DELAY);
+
+
             // if(xQueueSend(rxQueue, &my_data, portMAX_DELAY) == pdPASS)
             // {
             //   return true;
@@ -177,7 +196,8 @@ static void ir_rx_TaskExec(void *arg)
           else
           {
             rlog_e(TAG, "Scan Code XOR Error!!!");
-            rlog_i(TAG, "Scan Code %s --- _addr: 0x%04x _cmd: 0x%04x", repeat ? "(repeat)" : "", _addr, _cmd);
+            //rlog_i(TAG, "Scan Code %s --- _addr: 0x%04x _cmd: 0x%04x", repeat ? "(repeat)" : "", _addr, _cmd);
+            rlog_i(TAG, "Scan Code %s --- my_data.address: 0x%04x my_data.command: 0x%04x", repeat ? "(repeat)" : "", _addr, _cmd);
           }
           #elif CONFIG_IR_PROTOCOL_RC5
             rlog_i(TAG, "Scan Code %s --- _addr: 0x%04x _cmd: 0x%04x", repeat ? "(repeat)" : "", _addr, _cmd);
@@ -210,27 +230,34 @@ static void ir_rx_TaskExec(void *arg)
 
 //   // ERR_CHECK(gpio_install_isr_service(0), "Failed to install ISR service");
 
-//   gpio_reset_pin(_gpioRx);
-//   ERR_CHECK(gpio_set_direction(_gpioRx, GPIO_MODE_INPUT), ERR_GPIO_SET_MODE);
-//   ERR_CHECK(gpio_set_pull_mode(_gpioRx, GPIO_FLOATING), ERR_GPIO_SET_MODE);
-//   ERR_CHECK(gpio_set_intr_type(_gpioRx, GPIO_INTR_ANYEDGE), ERR_GPIO_SET_ISR);
+//   // gpio_reset_pin(_gpioRx);
+//   // ERR_CHECK(gpio_set_direction(_gpioRx, GPIO_MODE_INPUT), ERR_GPIO_SET_MODE);
+//   // ERR_CHECK(gpio_set_pull_mode(_gpioRx, GPIO_FLOATING), ERR_GPIO_SET_MODE);
+//   // ERR_CHECK(gpio_set_intr_type(_gpioRx, GPIO_INTR_ANYEDGE), ERR_GPIO_SET_ISR);
 //   ERR_CHECK(gpio_isr_handler_add(_gpioRx, rxIsrHandler, queueProc), ERR_GPIO_SET_ISR);
 // }
 
 void irTaskStart()
 {
+  //rxQueue = xQueueCreate(32, sizeof(my_rx_data_t));
+
+
+
+#if CONFIG_IR_RX_STATIC_ALLOCATION
+
   rxQueue = xQueueCreate(32, sizeof(my_rx_data_t));
 
 
-//  xTaskCreate(ir_rx_task, "ir_rx_task", 2048, NULL, 10, NULL);
-
-#if CONFIG_IR_RX_STATIC_ALLOCATION
     static StaticTask_t ir_rx_TaskBuffer;
     static StackType_t ir_rx_TaskStack[CONFIG_IR_RX_TASK_STACK_SIZE];
     _ir_rx_Task = xTaskCreateStaticPinnedToCore(ir_rx_TaskExec, ir_rx_TaskName, 
       CONFIG_IR_RX_TASK_STACK_SIZE, NULL, CONFIG_TASK_PRIORITY_SENSORS, ir_rx_TaskStack, 
        &ir_rx_TaskBuffer, CONFIG_TASK_CORE_SENSORS);
  #else
+
+  rxQueue = xQueueCreate(32, sizeof(my_rx_data_t));
+
+
   //xTaskCreate(ir_rx_TaskExec, "ir_rx_task", 2048, NULL, 10, NULL);
     xTaskCreatePinnedToCore(ir_rx_TaskExec, ir_rx_TaskName, 
       CONFIG_IR_RX_TASK_STACK_SIZE, NULL, CONFIG_TASK_PRIORITY_IR_RX,
@@ -272,10 +299,10 @@ void irTaskStart()
 //   return _receivedValue != 0;
 // }
 
-// void rxIR_ResetAvailable()
-// {
-//   _receivedValue = 0;
-// }
+void ir_rx_ResetAvailable()
+{
+  _receivedValue = 0;
+}
 
 // uint16_t rxIR_GetReceivedValue()
 // {

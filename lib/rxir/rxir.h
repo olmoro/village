@@ -25,14 +25,14 @@ void irTaskStart();
 
 
 
-//void rxIR_Init(const uint8_t gpioRx, QueueHandle_t queueProc);
+void rxIR_Init(const uint8_t gpioRx, QueueHandle_t queueProc);
 //void rxIR_Init(const uint8_t gpioRx, QueueHandle_t queueProc);
 //void rxIR_Enable();
 //void rxIR_Disable();
 
 //bool rxIR_IsAvailable();
-//void rxIR_ResetAvailable();
-//uint32_t rxIR_GetReceivedValue();
+void      ir_rx_ResetAvailable();
+uint32_t rxIR_GetReceivedValue();
 uint16_t rxIR_GetReceivedBitLength();
 uint16_t rxIR_GetReceivedDelay();
 uint16_t rxIR_GetReceivedProtocol();
