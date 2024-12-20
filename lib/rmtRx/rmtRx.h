@@ -10,13 +10,6 @@
 #include "freertos/FreeRTOS.h"
 #include "freertos/queue.h"
 
-/** 
- * Number of maximum high/Low changes per packet.
- * We can handle up to (unsigned long) => 32 bit * 2 H/L changes per bit + 2 for sync
- */
-// #define RX433_SWITCH_MIN_CHANGES 7
-// #define RX433_SWITCH_MAX_CHANGES 67 
-
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -24,13 +17,6 @@ extern "C" {
 void irTaskStart();
 
 
-
-//void rxIR_Init(const uint8_t gpioRx, QueueHandle_t queueProc);
-//void rxIR_Enable();
-//void rxIR_Disable();
-
-//bool rxIR_IsAvailable();
-//void rxIR_ResetAvailable();
 uint32_t rxIR_GetReceivedValue();
 uint16_t rxIR_GetReceivedBitLength();
 uint16_t rxIR_GetReceivedDelay();

@@ -39,9 +39,8 @@
 #define CONFIG_IR_PROTOCOL_NEC 1    // moro
 //
 //static const char* logTAG = "RXIR";  // static const char* TAG = “MyModule“;
-static const char* TAG = "RXIR";  // static const char* TAG = “MyModule“;
+static const char* TAG = "PULT";
 
-//#define ERR_CHECK(err, str) if (err != ESP_OK) rlog_e(logTAG, "%s: #%d %s", str, err, esp_err_to_name(err));
 #define ERR_CHECK(err, str) if (err != ESP_OK) rlog_e(TAG, "%s: #%d %s", str, err, esp_err_to_name(err));
 #define ERR_GPIO_SET_MODE "Failed to set GPIO mode"
 #define ERR_GPIO_SET_ISR  "Failed to set ISR handler"
@@ -83,82 +82,81 @@ static void ir_rx_task(void *arg)
    прерываний используются по умолчанию. */
   rmt_driver_install(rx_channel, 1000, 0);
 
-  /* По умолчанию инициализируется парсер для входящих пакетов */
+    /* По умолчанию инициализируется парсер для входящих пакетов */
   ir_parser_config_t ir_parser_config = IR_PARSER_DEFAULT_CONFIG((ir_dev_t)rx_channel);
 
-    // Флаг использования расширенных ИК-протоколов для NEC и RC5
+    /* Флаг использования расширенных ИК-протоколов для NEC и RC5 */
   ir_parser_config.flags |= IR_TOOLS_FLAGS_PROTO_EXT;
 
-    // Указатель для ИК-парсера
+    /* Указатель для ИК-парсера */
   ir_parser_t *ir_parser = NULL;
 
-    // Инициализируется парсер в зависимости от используемого протокола
+    /* Инициализируется парсер в зависимости от используемого протокола */
   #if CONFIG_IR_PROTOCOL_NEC
     ir_parser = ir_parser_rmt_new_nec(&ir_parser_config);
   #elif CONFIG_IR_PROTOCOL_RC5
     ir_parser = ir_parser_rmt_new_rc5(&ir_parser_config);
   #endif
 
-         //ir_parser = ir_parser_rmt_new_nec(&ir_parser_config);
-
-  //get RMT RX ringbuffer
-
+    /* get RMT RX ringbuffer */
   rmt_get_ringbuf_handle(rx_channel, &rb);
 
-    // Проверка буфера на ошибки
+    /* Проверка буфера на ошибки */
   assert(rb != NULL);
 
-  // Запуск модуля
+    /* Запуск модуля */
   rmt_rx_start(rx_channel, true);
 
-  /* В бесконечном цикле начнём принимать наши пакеты. */
+    /* В бесконечном цикле начнём принимать наши пакеты. */
   while (1)
   {
-    // Попытка принять пакет
+      /* Попытка принять пакет */
     items = (rmt_item32_t *) xRingbufferReceive(rb, &length, portMAX_DELAY);
 
-    // Если пакет непустой, то изменим уровень ножки светодиода
+    /* Если пакет непустой, то изменим уровень ножки светодиода */
     if (items) 
     {
       // Вставить индикацию или ...
 
-      // Получить остаток от деления на 4 значения длины пакета
+        /* Получить остаток от деления на 4 значения длины пакета */
       length /= 4; // one RMT = 4 Bytes
 
-      // Точка входа в пакет
+        /* Точка входа в пакет */
       if (ir_parser->input(ir_parser, items, length) == ESP_OK) 
       {
-        // Скан-код после декодирования
+          /* Скан-код после декодирования */
         if (ir_parser->get_scan_code(ir_parser, &addr, &cmd, &repeat) == ESP_OK) 
         {
-          // Вывод в терминал адреса и команды в зависимости от типа протокола
-          // rlog_i(TAG, "Scan Code %s --- addr: 0x%04"PRIx32" cmd: 0x%04"PRIx32, repeat ? "(repeat)" : "", addr, cmd);
-          // rlog_i(TAG, "Scan Code %s --- addr: 0x%04" PRIx32 " cmd: 0x%04" PRIx32, repeat ? "(repeat)" : "", addr, cmd);
+            /* Вывод в терминал адреса и команды */
+          rlog_i(TAG, "Scan Code %s --- addr: 0x%04" PRIx32" cmd: 0x%04" PRIx32, repeat ? "(repeat)" : "", addr, cmd);
 
-          #if CONFIG_IR_PROTOCOL_NEC
-          if(((uint8_t)addr == (uint8_t)~(addr>>8)) && ((uint8_t)cmd == (uint8_t)~(cmd>>8)))
-          {
-// ============ moro
-            _receivedValue = cmd;
-            _receivedBitlength = length;
-            // static volatile uint16_t _receivedDelay = 0;
-// ============ 
-            rlog_i(TAG, "Scan Code %s --- addr: 0x%02x, cmd: 0x%02x", repeat ? "(repeat)" : "",
-                  (uint8_t)addr, (uint8_t)cmd);
-          }
-          else
-          {
-            rlog_e(TAG, "Scan Code XOR Error!!!");
-            rlog_i(TAG, "Scan Code %s --- addr: 0x%04x cmd: 0x%04x", repeat ? "(repeat)" : "", addr, cmd);
-          }
-          #elif CONFIG_IR_PROTOCOL_RC5
-            rlog_i(TAG, "Scan Code %s --- addr: 0x%04x cmd: 0x%04x", repeat ? "(repeat)" : "", addr, cmd);
-          #endif
+
+
+
+          //           #if CONFIG_IR_PROTOCOL_NEC
+          //           if(((uint8_t)addr == (uint8_t)~(addr>>8)) && ((uint8_t)cmd == (uint8_t)~(cmd>>8)))
+          //           {
+          // // ============ moro
+          //             _receivedValue = cmd;
+          //             _receivedBitlength = length;
+          //             // static volatile uint16_t _receivedDelay = 0;
+          // // ============ 
+          //             rlog_i(TAG, "Scan Code %s --- addr: 0x%02x, cmd: 0x%02x", repeat ? "(repeat)" : "",
+          //                   (uint8_t)addr, (uint8_t)cmd);
+          //           }
+          //           else
+          //           {
+          //             rlog_e(TAG, "Scan Code XOR Error!!!");
+          //             rlog_i(TAG, "Scan Code %s --- addr: 0x%04x cmd: 0x%04x", repeat ? "(repeat)" : "", addr, cmd);
+          //           }
+          //           #elif CONFIG_IR_PROTOCOL_RC5
+          //             rlog_i(TAG, "Scan Code %s --- addr: 0x%04x cmd: 0x%04x", repeat ? "(repeat)" : "", addr, cmd);
+          //           #endif
         }
       }
-      /* Выйдем из двух условий и после синтаксического анализа данных возвратим пробелы
+        /* Выйдем из двух условий и после синтаксического анализа данных возвратим пробелы
         в кольцевой буфер */
-      //after parsing the data, return spaces to ringbuffer.
+        //after parsing the data, return spaces to ringbuffer.
       vRingbufferReturnItem(rb, (void *) items);
     }
   }
