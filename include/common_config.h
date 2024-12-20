@@ -121,12 +121,12 @@
 //                          ИК пульт 
 // ------------------------------------------------------------------------
 // Интервал чтения данных с пульта в миллисекундах
-#define CONFIG_IR_RX_TASK_CYCLE 300 // уточнить
+#define CONFIG_RX_TASK_CYCLE 300 // уточнить
 /* Использовать статическое выделение памяти под задачу и очередь. 
      Должен быть включен параметр CONFIG_FREERTOS_SUPPORT_STATIC_ALLOCATION! */
-#define CONFIG_IR_RX_STATIC_ALLOCATION 1
+#define CONFIG_RX_STATIC_ALLOCATION 1
 // Размер стека для задачи
-#define CONFIG_IR_RX_TASK_STACK_SIZE 2*1024
+#define CONFIG_RX_TASK_STACK_SIZE 2*1024
 // RU: Размер очереди для задачи чтения данных с пульта
 #define CONFIG_ALARM_QUEUE_SIZE 32
 

@@ -1,79 +1,68 @@
 /*
-* 2024.12.15 Не закончено
+* 2024.12.20 Не закончено
 * 
 */
 
-    #include "meAlarm.h"
 
-
-#include "sensors.h"
-#include "rxir.h"
+#include "rmtRx.h"
+//#include "reRx433.h"
 #include <stdint.h>
 #include <stdio.h>
 #include "time.h"
-// #include "esp_err.h"
-// #include "esp_timer.h"
-      //#include <driver/gpio.h>
-#include "rLog.h"     // https://kotyara12.ru/iot/esp_log/  не заменять
+#include "esp_err.h"
+#include "esp_timer.h"
+//#include <driver/gpio.h>
+#include "rLog.h"     // https://kotyara12.ru/iot/esp_log/  
 #include "mTypes.h"
 
-#include <inttypes.h>
-#include <string.h>
-#include "sdkconfig.h"
-#include "freertos/FreeRTOS.h"
-#include "freertos/task.h"
-#include "freertos/queue.h"
-
-#include "driver/rmt.h"   // rmt_rx.h не совместим
-#include "ir_tools.h"
+// #include <stdio.h>
+ #include <inttypes.h>
+ #include <string.h>
+ #include "sdkconfig.h"
+ #include "freertos/FreeRTOS.h"
+ #include "freertos/task.h"
+// #include "esp_log.h" 
+                        /* https://kotyara12.ru/iot/esp_log/
+                        ESP_LOGE – ошибка (минимальный уровень детализации)
+                        ESP_LOGW – предупреждение
+                        ESP_LOGI – информация
+                        ESP_LOGD – отладочные сообщения
+                        ESP_LOGV – всё подряд (максимальный уровень детализации) 
+                        */
+ #include "driver/rmt.h"
+ //#include "driver/rmt_rx.h"
+ #include "ir_tools.h"
 
 #define CONFIG_RMT_RX_CHANNEL (rmt_channel_t) 4
 #define CONFIG_RMT_RX_GPIO (gpio_num_t) CONFIG_GPIO_RX_IR   //35
 
-//#define CONFIG_IR_PROTOCOL_NEC 1    // moro
+#define CONFIG_IR_PROTOCOL_NEC 1    // moro
 //
-static const char* TAG = "IR_RX";
-static const char* ir_rx_TaskName = "irPult";
-static TaskHandle_t _ir_rx_Task;
-static bool _sensorsNeedStore = false; // ???
+//static const char* logTAG = "RXIR";  // static const char* TAG = “MyModule“;
+static const char* TAG = "RXIR";  // static const char* TAG = “MyModule“;
 
 //#define ERR_CHECK(err, str) if (err != ESP_OK) rlog_e(logTAG, "%s: #%d %s", str, err, esp_err_to_name(err));
 #define ERR_CHECK(err, str) if (err != ESP_OK) rlog_e(TAG, "%s: #%d %s", str, err, esp_err_to_name(err));
 #define ERR_GPIO_SET_MODE "Failed to set GPIO mode"
 #define ERR_GPIO_SET_ISR  "Failed to set ISR handler"
 
-// Очередь для приёма данных
-static QueueHandle_t rxQueue = NULL;
-
-typedef struct {
-  uint16_t address;
-  uint16_t command;
-  bool repeat;
-} my_rx_data_t;
-
-my_rx_data_t my_data;
-
 static volatile uint32_t _receivedValue = 0;
 static volatile uint16_t _receivedBitlength = 0;
 static volatile uint16_t _receivedDelay = 0;
 static volatile uint16_t _receivedProtocol = 0;
 
-static volatile uint16_t address = 0;
-static volatile uint16_t command = 0;
-
-
-
 // ------------------------------------------------------------------------
-//                                      Задача
+//            ISR handler (Integrated Services Router handler?)
 // ------------------------------------------------------------------------
 
 static gpio_num_t _gpioRx = GPIO_NUM_MAX;
 
-static void ir_rx_TaskExec(void *arg)
+// static void IRAM_ATTR rxIsrHandler(void* arg)
+static void ir_rx_task(void *arg)
 {
   rlog_d(pcTaskGetName(0), "Start");
-  uint32_t _addr = 0;
-  uint32_t _cmd = 0;
+  uint32_t addr = 0;
+  uint32_t cmd = 0;
   size_t length = 0;
 
   // Объявление переменной для хранения булевского значения, повторяется ли пакет
@@ -90,8 +79,8 @@ static void ir_rx_TaskExec(void *arg)
   rmt_config_t rmt_rx_config = RMT_DEFAULT_CONFIG_RX(CONFIG_RMT_RX_GPIO, rx_channel);
   rmt_config(&rmt_rx_config);
 
-    /* Назначение размера буфера, ноль в третьем параметре - флаги прерываний 
-    используются по умолчанию. */
+    /* Назначить размер буфера, ноль в третьем параметре гласит о том, что флаги 
+   прерываний используются по умолчанию. */
   rmt_driver_install(rx_channel, 1000, 0);
 
   /* По умолчанию инициализируется парсер для входящих пакетов */
@@ -140,67 +129,30 @@ static void ir_rx_TaskExec(void *arg)
       if (ir_parser->input(ir_parser, items, length) == ESP_OK) 
       {
         // Скан-код после декодирования
-        if (ir_parser->get_scan_code(ir_parser, &_addr, &_cmd, &repeat) == ESP_OK) 
+        if (ir_parser->get_scan_code(ir_parser, &addr, &cmd, &repeat) == ESP_OK) 
         {
           // Вывод в терминал адреса и команды в зависимости от типа протокола
-       //   rlog_i(TAG, "Scan Code %s --- _addr: 0x%04"PRIx32" _cmd: 0x%04"PRIx32, repeat ? "(repeat)" : "", _addr, _cmd);
-       // rlog_i(TAG, "Scan Code %s --- _addr: 0x%04" PRIx32 " _cmd: 0x%04" PRIx32, repeat ? "(repeat)" : "", _addr, _cmd);
+          // rlog_i(TAG, "Scan Code %s --- addr: 0x%04"PRIx32" cmd: 0x%04"PRIx32, repeat ? "(repeat)" : "", addr, cmd);
+          // rlog_i(TAG, "Scan Code %s --- addr: 0x%04" PRIx32 " cmd: 0x%04" PRIx32, repeat ? "(repeat)" : "", addr, cmd);
 
           #if CONFIG_IR_PROTOCOL_NEC
-          if(((uint8_t)_addr == (uint8_t)~(_addr>>8)) && ((uint8_t)_cmd == (uint8_t)~(_cmd>>8)))
+          if(((uint8_t)addr == (uint8_t)~(addr>>8)) && ((uint8_t)cmd == (uint8_t)~(cmd>>8)))
           {
 // ============ moro
-          //  _receivedValue = _cmd;
-          //  _receivedBitlength = length;
+            _receivedValue = cmd;
+            _receivedBitlength = length;
             // static volatile uint16_t _receivedDelay = 0;
-
-            my_data.address = _addr;
-            my_data.command = _cmd;
-            my_data.repeat = repeat;
-
-            ir_rx_ResetAvailable();              // reset recieved value
-
-              // we have not woken a task at the start of the ISR
-            BaseType_t xHigherPriorityTaskWoken = pdFALSE;
-              // публиковать данные
-            xQueueSendFromISR(rxQueue, &my_data, &xHigherPriorityTaskWoken);
-
-              // now the buffer is empty we can switch context if necessary.
-            if (xHigherPriorityTaskWoken) 
-            {
-                portYIELD_FROM_ISR();
-            } else {
-              // reset recieved value
-              ir_rx_ResetAvailable();
-            };
-
-    //    xQueueSend(rxQueue, &my_data, portMAX_DELAY);
-
-
-            // if(xQueueSend(rxQueue, &my_data, portMAX_DELAY) == pdPASS)
-            // {
-            //   return true;
-            // } else
-            // {
-            //   rlog_i(TAG, "Failed [%s] !", ir_rx_taskName);
-            //   return false;
-            // }
-
 // ============ 
-            //rlog_i(TAG, "Scan Code %s --- _addr: 0x%02x, _cmd: 0x%02x", repeat ? "(repeat)" : "",
-            //                  (uint8_t)_addr, (uint8_t)_cmd);
-
-            rlog_i(TAG, "Scan Code %s --- _addr: 0x%04x, _cmd: 0x%04x", repeat ? "(repeat)" : "",
-                  (uint16_t)_addr, (uint16_t)_cmd);
+            rlog_i(TAG, "Scan Code %s --- addr: 0x%02x, cmd: 0x%02x", repeat ? "(repeat)" : "",
+                  (uint8_t)addr, (uint8_t)cmd);
           }
           else
           {
             rlog_e(TAG, "Scan Code XOR Error!!!");
-            //rlog_i(TAG, "Scan Code %s --- _addr: 0x%04x _cmd: 0x%04x", repeat ? "(repeat)" : "", _addr, _cmd);
-            rlog_i(TAG, "Scan Code %s --- my_data.address: 0x%04x my_data.command: 0x%04x", repeat ? "(repeat)" : "", _addr, _cmd);
+            rlog_i(TAG, "Scan Code %s --- addr: 0x%04x cmd: 0x%04x", repeat ? "(repeat)" : "", addr, cmd);
           }
           #elif CONFIG_IR_PROTOCOL_RC5
-            rlog_i(TAG, "Scan Code %s --- _addr: 0x%04x _cmd: 0x%04x", repeat ? "(repeat)" : "", _addr, _cmd);
+            rlog_i(TAG, "Scan Code %s --- addr: 0x%04x cmd: 0x%04x", repeat ? "(repeat)" : "", addr, cmd);
           #endif
         }
       }
@@ -230,41 +182,19 @@ static void ir_rx_TaskExec(void *arg)
 
 //   // ERR_CHECK(gpio_install_isr_service(0), "Failed to install ISR service");
 
-//   // gpio_reset_pin(_gpioRx);
-//   // ERR_CHECK(gpio_set_direction(_gpioRx, GPIO_MODE_INPUT), ERR_GPIO_SET_MODE);
-//   // ERR_CHECK(gpio_set_pull_mode(_gpioRx, GPIO_FLOATING), ERR_GPIO_SET_MODE);
-//   // ERR_CHECK(gpio_set_intr_type(_gpioRx, GPIO_INTR_ANYEDGE), ERR_GPIO_SET_ISR);
+//   gpio_reset_pin(_gpioRx);
+//   ERR_CHECK(gpio_set_direction(_gpioRx, GPIO_MODE_INPUT), ERR_GPIO_SET_MODE);
+//   ERR_CHECK(gpio_set_pull_mode(_gpioRx, GPIO_FLOATING), ERR_GPIO_SET_MODE);
+//   ERR_CHECK(gpio_set_intr_type(_gpioRx, GPIO_INTR_ANYEDGE), ERR_GPIO_SET_ISR);
+//   //ERR_CHECK(gpio_isr_handler_add(_gpioRx, rxIsrHandler, queueProc), ERR_GPIO_SET_ISR);
 //   ERR_CHECK(gpio_isr_handler_add(_gpioRx, rxIsrHandler, queueProc), ERR_GPIO_SET_ISR);
 // }
 
 void irTaskStart()
 {
-  //rxQueue = xQueueCreate(32, sizeof(my_rx_data_t));
+  // led ...
 
-
-
-#if CONFIG_IR_RX_STATIC_ALLOCATION
-
-  rxQueue = xQueueCreate(32, sizeof(my_rx_data_t));
-
-
-    static StaticTask_t ir_rx_TaskBuffer;
-    static StackType_t ir_rx_TaskStack[CONFIG_IR_RX_TASK_STACK_SIZE];
-    _ir_rx_Task = xTaskCreateStaticPinnedToCore(ir_rx_TaskExec, ir_rx_TaskName, 
-      CONFIG_IR_RX_TASK_STACK_SIZE, NULL, CONFIG_TASK_PRIORITY_SENSORS, ir_rx_TaskStack, 
-       &ir_rx_TaskBuffer, CONFIG_TASK_CORE_SENSORS);
- #else
-
-  rxQueue = xQueueCreate(32, sizeof(my_rx_data_t));
-
-
-  //xTaskCreate(ir_rx_TaskExec, "ir_rx_task", 2048, NULL, 10, NULL);
-    xTaskCreatePinnedToCore(ir_rx_TaskExec, ir_rx_TaskName, 
-      CONFIG_IR_RX_TASK_STACK_SIZE, NULL, CONFIG_TASK_PRIORITY_IR_RX,
-        &_ir_rx_Task, CONFIG_TASK_CORE_IR_RX);
-#endif // CONFIG_IR_RX_STATIC_ALLOCATION
-
-
+  xTaskCreate(ir_rx_task, "ir_rx_task", 2048, NULL, 10, NULL);
 }
 
 
@@ -299,20 +229,18 @@ void irTaskStart()
 //   return _receivedValue != 0;
 // }
 
-void ir_rx_ResetAvailable()
-{
-  _receivedValue = 0;
-}
-
-// uint16_t rxIR_GetReceivedValue()
+// void rxIR_ResetAvailable()
 // {
-//   if(address == 0xff00)
-//   return command;     //_receivedValue;
+//   _receivedValue = 0;
 // }
+
+uint32_t rxIR_GetReceivedValue()
+{
+  return _receivedValue;
+}
 
 uint16_t rxIR_GetReceivedBitLength()
 {
-
   return _receivedBitlength;
 }
 

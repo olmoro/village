@@ -10,9 +10,6 @@
             "includePath": [
                 "E:/PlatformIO/zoo/village/src",
                 "E:/PlatformIO/zoo/village/lib/security",
-                "E:/PlatformIO/zoo/village/lib/rxir",
-                "E:/PlatformIO/zoo/libs/infrared_tools/include",
-                "E:/PlatformIO/zoo/libs/infrared_tools/src",
                 "E:/PlatformIO/zoo/libs/peripherals/reGpio/include",
                 "E:/PlatformIO/zoo/libs/peripherals/reGpio/src",
                 "E:/PlatformIO/zoo/village/lib/meAlarm/include",
@@ -24,6 +21,9 @@
                 "E:/PlatformIO/zoo/libs/sensors/reDS18x20/src",
                 "E:/PlatformIO/zoo/libs/peripherals/reRangeMonitor/include",
                 "E:/PlatformIO/zoo/libs/peripherals/reRangeMonitor/src",
+                "E:/PlatformIO/zoo/village/lib/rxir",
+                "E:/PlatformIO/zoo/libs/infrared_tools/include",
+                "E:/PlatformIO/zoo/libs/infrared_tools/src",
                 "E:/PlatformIO/zoo/libs/wifi/rePinger/include",
                 "E:/PlatformIO/zoo/libs/wifi/rePinger/src",
                 "E:/PlatformIO/zoo/libs/clouds/reDataSend/include",
@@ -295,6 +295,7 @@
                 "E:/PlatformIO/zoo/libs/wifi",
                 "E:/PlatformIO/zoo/village/lib/infrared_tools/include",
                 "E:/PlatformIO/zoo/village/lib/infrared_tools/src",
+                "E:/PlatformIO/zoo/village/lib/rmtRx_txt",
                 ""
             ],
             "browse": {
@@ -302,9 +303,6 @@
                 "path": [
                     "E:/PlatformIO/zoo/village/src",
                     "E:/PlatformIO/zoo/village/lib/security",
-                    "E:/PlatformIO/zoo/village/lib/rxir",
-                    "E:/PlatformIO/zoo/libs/infrared_tools/include",
-                    "E:/PlatformIO/zoo/libs/infrared_tools/src",
                     "E:/PlatformIO/zoo/libs/peripherals/reGpio/include",
                     "E:/PlatformIO/zoo/libs/peripherals/reGpio/src",
                     "E:/PlatformIO/zoo/village/lib/meAlarm/include",
@@ -316,6 +314,9 @@
                     "E:/PlatformIO/zoo/libs/sensors/reDS18x20/src",
                     "E:/PlatformIO/zoo/libs/peripherals/reRangeMonitor/include",
                     "E:/PlatformIO/zoo/libs/peripherals/reRangeMonitor/src",
+                    "E:/PlatformIO/zoo/village/lib/rxir",
+                    "E:/PlatformIO/zoo/libs/infrared_tools/include",
+                    "E:/PlatformIO/zoo/libs/infrared_tools/src",
                     "E:/PlatformIO/zoo/libs/wifi/rePinger/include",
                     "E:/PlatformIO/zoo/libs/wifi/rePinger/src",
                     "E:/PlatformIO/zoo/libs/clouds/reDataSend/include",
@@ -587,6 +588,7 @@
                     "E:/PlatformIO/zoo/libs/wifi",
                     "E:/PlatformIO/zoo/village/lib/infrared_tools/include",
                     "E:/PlatformIO/zoo/village/lib/infrared_tools/src",
+                    "E:/PlatformIO/zoo/village/lib/rmtRx_txt",
                     ""
                 ]
             },

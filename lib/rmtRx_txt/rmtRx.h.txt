@@ -1,0 +1,27 @@
+/* 
+  Модуль для приема данных с ИК пульта по протоколу NEC.
+  IR protocols example  https://github.com/nopnop2002/esp-idf-irSend
+  NEC IR Code Specification
+  Specification  https://user-images.githubusercontent.com/6020549/59671633-f7fd4b80-91f8-11e9-9bc6-45ab6e18ebc8.jpg
+*/
+
+#ifndef _MRTRX_H_
+#define _MRTRX_H_
+
+#include <stdbool.h>
+#include "reLed.h"
+#include "freertos/FreeRTOS.h"
+#include "freertos/queue.h"
+
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+void rxTaskStart(const uint8_t gpioRx, QueueHandle_t queueProc);
+void rx_ResetAvailable();
+#ifdef __cplusplus
+}
+#endif
+
+#endif // _MRTRX_H_

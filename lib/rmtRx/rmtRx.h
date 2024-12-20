@@ -2,8 +2,8 @@
   Модуль для приема данных с ИК пульта по протоколу NEC.  
 */
 
-#ifndef _RXIR_H_
-#define _RXIR_H_
+#ifndef _RMTRX_H_
+#define _RMTRX_H_
 
 #include <stdbool.h>
 #include "reLed.h"
@@ -25,13 +25,12 @@ void irTaskStart();
 
 
 
-void rxIR_Init(const uint8_t gpioRx, QueueHandle_t queueProc);
 //void rxIR_Init(const uint8_t gpioRx, QueueHandle_t queueProc);
 //void rxIR_Enable();
 //void rxIR_Disable();
 
 //bool rxIR_IsAvailable();
-void      ir_rx_ResetAvailable();
+//void rxIR_ResetAvailable();
 uint32_t rxIR_GetReceivedValue();
 uint16_t rxIR_GetReceivedBitLength();
 uint16_t rxIR_GetReceivedDelay();
@@ -41,4 +40,4 @@ uint16_t rxIR_GetReceivedProtocol();
 }
 #endif
 
-#endif // _RXIR_H_
+#endif // _RMTRX_H_

@@ -10,7 +10,7 @@
 #include "reEvents.h"
 #include "reParams.h"
 #include "rLog.h"
-#include "rxir.h"   
+#include "rmtRx.h"   
 
 static const char* logTAG = "ALARM";
 
@@ -69,13 +69,12 @@ void alarmInitDevices()
     rx433_Enable();
   #endif // CONFIG_GPIO_RX433
 
-  // Запускаем приемник ИК
-  #if defined (CONFIG_GPIO_RX_IR) && (CONFIG_GPIO_RX_IR > -1)
-    //rxIR_Init(CONFIG_GPIO_RX_IR, alarmTaskQueue());
-    //rxIR_Enable();
-    irTaskStart();
-    //irTaskStart(CONFIG_GPIO_RX_IR, alarmTaskQueue());
-  #endif // CONFIG_GPIO_RX_IR
+  // // Запускаем приемник ИК
+  // #if defined (CONFIG_GPIO_RX_IR) && (CONFIG_GPIO_RX_IR > -1)
+
+  //   rxIR_Init(CONFIG_GPIO_RX_IR, alarmTaskQueue());
+  //   rxIR_Enable();
+  // #endif // CONFIG_GPIO_RX_IR
 }
 
 void alarmInitSensors()
